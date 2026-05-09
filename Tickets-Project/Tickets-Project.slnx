@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Tickets-Project.vcxproj" />
+  <Project Path="Tickets-Project.vcxproj" Id="668bb0a9-13b4-4d3f-b4a3-515f7e0755d2" />
 </Solution>
