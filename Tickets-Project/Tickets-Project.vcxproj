@@ -127,8 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicCommands.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Open.h" />
+    <ClCompile Include="BasicCommands.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

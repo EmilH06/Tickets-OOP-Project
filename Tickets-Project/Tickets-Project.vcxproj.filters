@@ -18,8 +18,11 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Open.h">
+    <ClCompile Include="BasicCommands.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicCommands.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
