@@ -36,9 +36,15 @@ int main() {
 		else if (command == "saveas") {
 			error_catcher([&]() {task.file_saveas(filename); });
 		}
+		else if (command == "help") {
+			task.help();
+		}
 		else if (command == "exit") {
-			std::cout << "Exiting the program...";
+			task.file_exit();
 			break;
+		}
+		else {
+			std::cout << "Invalid command! Please use the allowed commands!" << std::endl;
 		}
 	}
 }

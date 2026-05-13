@@ -103,3 +103,14 @@ void BasicCommands::file_saveas(std::string& filename) {
 	file.close();
 	file_open(filename);
 }
+void BasicCommands::help() {
+	std::cout << "The following commands are supported:\n" << "open <file>   - opens <file>\n" <<
+		"close         - closes currently opened file\n" << "save          - saves the currently opened file\n" <<
+		"saveas <file> - saves the currently opened file in <file>\n" << "help          - prints this information\n" <<
+		"exit          - exits the program\n";
+}
+void BasicCommands :: file_exit(){
+	std::remove("temp.txt");
+	access = false;
+	std::cout << "Exiting the program...";
+}

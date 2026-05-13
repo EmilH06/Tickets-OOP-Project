@@ -11,6 +11,8 @@ public:
 	void file_close(const std::string& filename);
 	void file_save(const std::string& filename);
 	void file_saveas(std::string& filename);
+	void help();
+	void file_exit();
 	~BasicCommands() {
 		if (!file.is_open()) {
 			file.close();
