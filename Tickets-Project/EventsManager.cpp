@@ -1,4 +1,5 @@
-#include "BasicCommands.h"
+#include "EventsManager.h"
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -18,26 +19,16 @@ void validate_FileName(const std::string& filename) {
 		}
 	}
 }
-void BasicCommands::file_open(const std::string& filename) {
+void Manager::file_open(const std::string& filename) {
 	validate_FileName(filename);
 	if (file.is_open()) {
 		throw std::logic_error("Another file has already been opend. Close it before opening a new one!");
 	}
 	file.clear();
-	file.open(filename, std::ios::in | std::ios::out |std::ios::app);
+	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
-	file.seekg(0, std::ios::beg);
-	std::ofstream temp("temp.txt", std::ios::out |std::ios::trunc);
-	if (!temp.is_open()) {
-		throw std::runtime_error("Failed to create temporary temp.txt!");
-	}
-	char buffer[256];
-	while (file.getline(buffer, 256)) {
-		temp << buffer << '\n';
-	}
-	temp.close();
 	access = true;
 	if (!file_saves) {
 		std::cout << "Successfully opened file " << filename << std::endl;
@@ -47,37 +38,27 @@ void BasicCommands::file_open(const std::string& filename) {
 		file_saves = false;
 	}
 }
-void BasicCommands::file_close(const std::string& filename) {
+void Manager::file_close(const std::string& filename) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
 	file.close();
-	std::remove("temp.txt");
-	
 	access = false;
 	std::cout << "Successfully closed document " << filename << std::endl;
 }
-void BasicCommands::file_save(const std::string& filename) {
+void Manager::file_save(const std::string& filename) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
-	std::ifstream temp("temp.txt", std::ios::in);
-	if (!temp.is_open()) {
-		throw std::runtime_error("Failed to open temporary temp.txt!");
-	}
 	file.close();
-	file.open(filename, std::ios::out |std::ios::in | std::ios::trunc);
+	file.open(filename, std::ios::out | std::ios::in | std::ios::trunc);
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
-	char buffer[256];
-	while (temp.getline(buffer, 256)) {
-		file << buffer << '\n';
-	}
-	temp.close();
+
 	std::cout << "Successfully saved file " << filename << std::endl;
 }
-void BasicCommands::file_saveas(std::string& filename) {
+void Manager::file_saveas(std::string& filename) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
@@ -88,28 +69,24 @@ void BasicCommands::file_saveas(std::string& filename) {
 	if (!newFile.is_open()) {
 		throw std::runtime_error("Incorrect location input or you're trying to access prohibited area!");
 	}
-	std::ifstream temp("temp.txt", std::ios::in);
-	if (!temp.is_open()) {
-		throw std::runtime_error("Failed to open temporary temp.txt!");
-	}
+
 	char buffer[256];
-	while (temp.getline(buffer, 256)) {
+	while (file.getline(buffer, 256)) {
 		newFile << buffer << '\n';
 	}
 	filename = newName;
 	file_saves = true;
-	temp.close();
 	newFile.close();
 	file.close();
 	file_open(filename);
 }
-void BasicCommands::help() {
+void Manager::help() const{
 	std::cout << "The following commands are supported:\n" << "open <file>   - opens <file>\n" <<
 		"close         - closes currently opened file\n" << "save          - saves the currently opened file\n" <<
 		"saveas <file> - saves the currently opened file in <file>\n" << "help          - prints this information\n" <<
 		"exit          - exits the program\n";
 }
-void BasicCommands :: file_exit(){
+void Manager::file_exit() {
 	std::remove("temp.txt");
 	access = false;
 	std::cout << "Exiting the program...";

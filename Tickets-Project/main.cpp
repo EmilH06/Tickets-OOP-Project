@@ -1,4 +1,5 @@
 #include "BasicCommands.h"
+#include "EventsManager.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -21,26 +22,26 @@ void error_catcher(std::function<void()> func) {
 int main() {
 	std::string command;
 	std::string filename;
-	BasicCommands task;
+	BasicCommand* task = new Manager();
 	while (std::cout << "> " && std::cin >> command) {
 	    if (command == "open") {
 				std::cin >> filename;
-				error_catcher([&]() {task.file_open(filename); });
+				error_catcher([&]() {task->file_open(filename); });
 	    }
 		else if (command == "close") {
-			error_catcher([&]() {task.file_close(filename); });
+			error_catcher([&]() {task->file_close(filename); });
 		}
 		else if (command == "save") {
-			error_catcher([&]() {task.file_save(filename); });
+			error_catcher([&]() {task->file_save(filename); });
 		}
 		else if (command == "saveas") {
-			error_catcher([&]() {task.file_saveas(filename); });
+			error_catcher([&]() {task->file_saveas(filename); });
 		}
 		else if (command == "help") {
-			task.help();
+			task->help();
 		}
 		else if (command == "exit") {
-			task.file_exit();
+			task->file_exit();
 			break;
 		}
 		else {

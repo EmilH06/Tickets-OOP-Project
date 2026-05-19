@@ -127,9 +127,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BasicCommands.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="EventsManager.cpp" />
+    <ClCompile Include="Halls.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="BasicCommands.h" />
+    <ClCompile Include="Ticket.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="EventsManager.h" />
+    <ClInclude Include="Halls.h" />
+    <ClInclude Include="Ticket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
