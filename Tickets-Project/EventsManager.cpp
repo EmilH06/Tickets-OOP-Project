@@ -19,6 +19,22 @@ void validate_FileName(const std::string& filename) {
 		}
 	}
 }
+Manager::Manager() {
+	std::ifstream file("data/HallsInformation.txt", std::ios::in);
+	if (!file.is_open()) {
+		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
+	}
+	std::string buffer, hall_name;
+	while (true) {
+		std::getline(file>>std::ws, hall_name, ':');
+		if (file.eof() || file.fail()) {
+			break;
+		}
+		avaiable_halls.push_back(hall_name);
+		std::getline(file, buffer);
+	}
+	file.close();
+};
 void Manager::file_open(const std::string& filename) {
 	validate_FileName(filename);
 	if (file.is_open()) {
@@ -30,7 +46,7 @@ void Manager::file_open(const std::string& filename) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
 	access = true;
-	if (!file_saves) {
+    if (!file_saves) {
 		std::cout << "Successfully opened file " << filename << std::endl;
 	}
 	else {
@@ -90,4 +106,84 @@ void Manager::file_exit() {
 	std::remove("temp.txt");
 	access = false;
 	std::cout << "Exiting the program...";
+}
+void Manager::addevent() {
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
+	}
+	std::string name, date, hall_name;
+	std::cin >> date;
+	std::cin.ignore();
+	std::getline(std::cin, name);
+	std::getline(std::cin, hall_name);
+    isValidDate(date, hall_name);
+	isValidEventName(name);
+	isValidHall(hall_name);
+	info.push_back(Event(name,date,hall_name));
+	std::cout << "Successfully added event:" << name<<std::endl;
+}
+void Manager::isValidEventName(const std::string name) const {
+	if (name.empty()) {
+		throw std::invalid_argument("Error: Name cannot be empty!");
+	}
+}
+void Manager::isValidHall(const std::string hall) const {
+	auto name_validator = [&]()->bool {for (std::string x : avaiable_halls) { if (x==hall) return true; }return false; };
+	if (!name_validator()) {
+		throw std::invalid_argument("There isn't avaiable hall with that name!");
+	}
+}
+void Manager::isValidDate(const std::string date, const std::string hall_name) const {
+	auto matchingDates = [&]()->bool {
+		for (Event x: info){
+			std::string other = x.getDate();
+			if (hall_name==x.getHallName() &&date.substr(0, 4) == other.substr(0, 4) && date.substr(5, 2) == other.substr(5, 2) && date.substr(8, 2) == other.substr(8, 2)) {
+				return true;
+			}
+		}
+		return false;
+	};
+	if (date.size() != 10) {
+		throw std::invalid_argument("Invalid date format. Input should have 10 symbols!");
+	}
+	if (date[4] != '-' || date[7] != '-') {
+		throw std::invalid_argument("Invalid date format. Format should be: 'xxxx-xx-xx'!");
+	}
+	for (int i = 0; i < date.size(); i++) {
+		if (i != 4 && i != 7) {
+			if (date[i] < '0' || date[i]>'9') {
+				throw std::invalid_argument("Invalid date format. The input should consist only of numbers and '-' as shown: 'YYYY-MM-DD'");
+			}
+		}
+	}
+	int year = std::stoi(date.substr(0, 4));
+	int mouth = std::stoi(date.substr(5, 2));
+	int day = std::stoi(date.substr(8, 2));
+	auto validDay = [&]()->bool {
+		switch (mouth) {
+		case 1:
+		case 3:
+		case 5:
+		case 7:
+		case 8:
+		case 10:
+		case 12: return (day >= 1 && day <= 31);
+		case 2: if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+			return (day >= 1 && day <= 29);
+		}
+			  else { return (day >= 1 && day < 29); }
+		case 4:
+		case 6:
+		case 9:
+		case 11: return (day >= 1 && day <= 30);
+		default: throw std::invalid_argument("Invalid date format. The mouth should be betweemn 1 and 12");
+		}
+		return false;
+	};
+	if (!validDay()) {
+		throw std::invalid_argument("Invalid date format. This mouth doesn't have that many days!");
+	}
+	if (matchingDates()) {
+		throw std::invalid_argument("Invalid date format. This date has already been reserved!");
+	}
 }

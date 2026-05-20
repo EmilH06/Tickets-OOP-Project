@@ -4,9 +4,12 @@
 #include <vector>
 #include <string>
 class Hall {
-	std::string name;
+	const std::string name;
+	std::vector<std::vector<int>> seats;
 	std::vector<Ticket> list;
-	const int rows, cols;
+	int rows = 0;
+	int cols = 0;
 public:
-	Hall(const std::string name_) : name(name_) , rows(0), cols(0) {};
+	Hall(const std::string name_);
+	std::string getName() const;
 };
