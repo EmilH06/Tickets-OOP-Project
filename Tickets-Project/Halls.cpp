@@ -22,8 +22,11 @@
 		std::getline(file, buffer);
 	}
 	file.close();
-	seats.resize(rows, std::vector<int>(cols,0));
+	seats.resize(rows, std::vector<TicketStatus>(cols,TicketStatus::AVAIABLE));
 	}
 	std::string Hall::getName() const {
 		return name;
+	}
+	std::vector<Ticket>& Hall::getList() {
+		return list;
 	}

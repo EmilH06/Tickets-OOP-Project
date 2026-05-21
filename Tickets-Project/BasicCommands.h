@@ -6,7 +6,6 @@
 class BasicCommand {
 protected:
 	bool access = false;
-	bool file_saves = false;
 public:
 	virtual void file_open(const std::string&) = 0;
 	virtual void file_close(const std::string&) = 0;

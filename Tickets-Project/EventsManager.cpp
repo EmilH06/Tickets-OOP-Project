@@ -19,6 +19,14 @@ void validate_FileName(const std::string& filename) {
 		}
 	}
 }
+std::ostream& operator<<(std::ostream& out, const Event& information) {
+	out << "<EVENT START>\n";
+	out << "Name:" << information.getName()<<'\n';
+	out << "Date:" << information.getDate() << '\n';
+	out << "Hall:" << information.getHallName() << '\n';
+	out << "<EVENT END>\n";
+	return out;
+}
 Manager::Manager() {
 	std::ifstream file("data/HallsInformation.txt", std::ios::in);
 	if (!file.is_open()) {
@@ -45,20 +53,60 @@ void Manager::file_open(const std::string& filename) {
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
+	file.seekg(0, std::ios::beg);
 	access = true;
-    if (!file_saves) {
-		std::cout << "Successfully opened file " << filename << std::endl;
+	std::string buffer,category;
+	std::string EventName, Date, HallName;
+	std::string Ticket_row, Ticket_seat, Ticket_status, Ticket_note;
+	while (true) {
+		std::getline(file>>std::ws, category, ':');
+		if (file.eof() || file.fail()) {
+			break;
+		}
+		if (category == "<EVENT START>") {
+			EventName.clear();
+			Date.clear();
+			HallName.clear();
+			Ticket_row.clear(); Ticket_seat.clear(); Ticket_status.clear(); Ticket_note.clear();
+			continue;
+		}
+		if (category == "<EVENT END>") {
+			if (!EventName.empty() && !Date.empty() && !HallName.empty()&& !Ticket_row.empty()&& !Ticket_seat.empty() && !Ticket_status.empty() &&!Ticket_note.empty()) {
+				Event event(Event(EventName, Date, HallName));
+				event.addTicket(Ticket_row, Ticket_seat, Ticket_status, Ticket_note);
+				info.push_back(event);
+			}
+			EventName.clear();
+			Date.clear();
+			HallName.clear();
+			(Ticket_row, Ticket_seat, Ticket_status, Ticket_note).clear();
+			continue;
+		}
+		if (category == "Name") {
+			std::getline(file, EventName);
+		}
+		if (category == "Date") {
+			std::getline(file, Date);
+		}
+		if (category == "Hall") {
+			std::getline(file, HallName);
+		}
+		if (category == "Ticket") {
+			std::string skip;
+			std::getline(file, skip);
+			file >> Ticket_row >> Ticket_seat >> Ticket_status >> Ticket_note;
+			std::getline(file, skip);
+		}
 	}
-	else {
-		std::cout << "Successfully saved another file " << filename << std::endl;
-		file_saves = false;
-	}
+	file.close();
+	std::cout << "Successfully opened file " << filename << std::endl;
 }
 void Manager::file_close(const std::string& filename) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
 	file.close();
+	info.clear();
 	access = false;
 	std::cout << "Successfully closed document " << filename << std::endl;
 }
@@ -71,7 +119,10 @@ void Manager::file_save(const std::string& filename) {
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
-
+	for (Event x : info) {
+		file << x;
+	}
+	file.close();
 	std::cout << "Successfully saved file " << filename << std::endl;
 }
 void Manager::file_saveas(std::string& filename) {
@@ -85,16 +136,13 @@ void Manager::file_saveas(std::string& filename) {
 	if (!newFile.is_open()) {
 		throw std::runtime_error("Incorrect location input or you're trying to access prohibited area!");
 	}
-
-	char buffer[256];
-	while (file.getline(buffer, 256)) {
-		newFile << buffer << '\n';
+	for (Event x : info) {
+		newFile << x;
 	}
 	filename = newName;
-	file_saves = true;
 	newFile.close();
 	file.close();
-	file_open(filename);
+	std::cout << "Successfully saved another " << filename << std::endl;
 }
 void Manager::help() const{
 	std::cout << "The following commands are supported:\n" << "open <file>   - opens <file>\n" <<
@@ -103,8 +151,8 @@ void Manager::help() const{
 		"exit          - exits the program\n";
 }
 void Manager::file_exit() {
-	std::remove("temp.txt");
 	access = false;
+	info.clear();
 	std::cout << "Exiting the program...";
 }
 void Manager::addevent() {
@@ -116,9 +164,9 @@ void Manager::addevent() {
 	std::cin.ignore();
 	std::getline(std::cin, name);
 	std::getline(std::cin, hall_name);
+	isValidHall(hall_name);
     isValidDate(date, hall_name);
 	isValidEventName(name);
-	isValidHall(hall_name);
 	info.push_back(Event(name,date,hall_name));
 	std::cout << "Successfully added event:" << name<<std::endl;
 }
@@ -149,7 +197,7 @@ void Manager::isValidDate(const std::string date, const std::string hall_name) c
 	if (date[4] != '-' || date[7] != '-') {
 		throw std::invalid_argument("Invalid date format. Format should be: 'xxxx-xx-xx'!");
 	}
-	for (int i = 0; i < date.size(); i++) {
+	for (size_t i = 0; i < date.size(); i++) {
 		if (i != 4 && i != 7) {
 			if (date[i] < '0' || date[i]>'9') {
 				throw std::invalid_argument("Invalid date format. The input should consist only of numbers and '-' as shown: 'YYYY-MM-DD'");
@@ -171,7 +219,7 @@ void Manager::isValidDate(const std::string date, const std::string hall_name) c
 		case 2: if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
 			return (day >= 1 && day <= 29);
 		}
-			  else { return (day >= 1 && day < 29); }
+			  else { return (day >= 1 && day <= 28); }
 		case 4:
 		case 6:
 		case 9:
