@@ -7,12 +7,12 @@ class Ticket {
 		RESERVED = 1,
 		PURCHASED = 2
 	};
-	const int row;
-	const int seat;
+    int row;
+	int seat;
 	TicketStatus status;
 	std::string note;
 	int ID;
 	static int ID_counter;
     public:
-		Ticket(const int row_, const int col_,const std::string status_, const std::string note);
+		Ticket(const int, const int , const int ,const std::string , const std::string );
 };

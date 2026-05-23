@@ -1,6 +1,6 @@
 #include "Event.h"
 #include <iostream>
-Event::Event(const std::string name, const std::string date, const std::string hall_name) : name(name), date(date), hall(hall_name) {}
+Event::Event(const std::string name, const std::string date, const Hall& hall_) : name(name), date(date), hall(hall_) {}
 std::string Event::getDate() const {
 	return date;
 }
@@ -10,6 +10,6 @@ std::string Event::getName() const {
 std::string Event::getHallName() const {
 	return hall.getName();
 }
-void Event::addTicket(const std::string row, const std::string seat, const std::string status, const std::string note) {
-	hall.getList().push_back(Ticket(std::stoi(row), std::stoi(seat), status, note));
+void Event::addTicket(const int ID,const int row, const int seat, const std::string status, const std::string note) {
+	hall.getList().push_back(Ticket(ID ,row, seat, status, note));
 }

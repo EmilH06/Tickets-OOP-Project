@@ -1,5 +1,6 @@
 #pragma once
 #include "BasicCommands.h"
+#include "Halls.h"
 #include "Event.h"
 #include <iostream>
 #include <vector>
@@ -8,7 +9,7 @@
 class Manager : public BasicCommand {
 	std::fstream file;
 	std::vector<Event> info;
-    std::vector<std::string> avaiable_halls;
+    std::vector<Hall> avaiable_halls;
 public:
 	Manager();
 	void file_open(const std::string&) override;

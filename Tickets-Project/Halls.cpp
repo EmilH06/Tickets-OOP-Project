@@ -4,29 +4,17 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-	Hall::Hall(const std::string name_) : name(name_) {
-	std::ifstream file("data/HallsInformation.txt", std::ios::in);
-	if (!file.is_open()) {
-			throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
-	}
-	std::string buffer,hall_name;
-	while (true) {
-		std::getline(file>>std::ws, hall_name, ':');
-		if (file.eof() || file.fail()) {
-			break;
-		}
-		if (hall_name == name) {
-			file >> rows >> cols;
-			break;
-		}
-		std::getline(file, buffer);
-	}
-	file.close();
-	seats.resize(rows, std::vector<TicketStatus>(cols,TicketStatus::AVAIABLE));
-	}
+Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_), rows(row_), cols(col_) {
+	seats.resize(rows, std::vector<TicketStatus>(cols, TicketStatus::AVAIABLE));
+}
 	std::string Hall::getName() const {
 		return name;
 	}
 	std::vector<Ticket>& Hall::getList() {
 		return list;
+	}
+	void Hall::saveTicket(const int row, const int col,const TicketStatus status) {
+		int rowIdx = row - 1;
+		int colIdx = col - 1;
+		seats[rowIdx][colIdx] = status;
 	}
