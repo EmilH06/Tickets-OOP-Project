@@ -1,5 +1,6 @@
 #pragma once
 #include "BasicCommands.h"
+#include "Ticket.h"
 #include "Halls.h"
 #include "Event.h"
 #include <iostream>

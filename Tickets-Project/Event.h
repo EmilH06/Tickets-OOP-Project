@@ -7,6 +7,7 @@ class Event {
 	Hall hall;
 public:
 	Event(const std::string name, const std::string date, const Hall& hall_);
+	Hall& getHall();
 	std::string getDate() const;
 	std::string getName() const;
 	std::string getHallName() const;

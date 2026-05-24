@@ -1,4 +1,5 @@
 #include "EventsManager.h"
+#include "Ticket.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -6,7 +7,7 @@
 #include <string>
 
 void validate_FileName(const std::string& filename) {
-	int size = filename.length();
+	size_t size= filename.length();
 	if (size < 5) {
 		throw std::invalid_argument("File is too short!");
 	}
@@ -19,36 +20,39 @@ void validate_FileName(const std::string& filename) {
 		}
 	}
 }
-std::ostream& operator<<(std::ostream& out, const Event& information) {
-	out << "<EVENT START>\n";
+std::ostream& operator<<(std::ostream& out, Event& information) {
+	std::vector<Ticket> copy = information.getHall().getList();
 	out << "Name:" << information.getName()<<'\n';
 	out << "Date:" << information.getDate() << '\n';
 	out << "Hall:" << information.getHallName() << '\n';
-	out << "<EVENT END>\n";
+	out << "Tickets:"<<'\n';
+	for (Ticket x : copy) {
+		out << x.getID() << ' ' << x.getRow() << ' ' << x.getSeat() << ' ' << x.getStatus() << ' ' << x.getNote() << '\n';
+	}
+	out << "<EVENT END>"<<'\n';
 	return out;
 }
-Manager::Manager() {
+Manager::Manager(){
 	std::ifstream file("data/HallsInformation.txt", std::ios::in);
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
 	std::string buffer, hall_name;
 	int rows, cols;
-	while (true) {
-		std::getline(file>>std::ws, hall_name, ':');
+	while (std::getline(file >> std::ws, hall_name, ':')) {
 		if (file.eof() || file.fail()) {
 			break;
 		}
 		file >> rows >> cols;
-		avaiable_halls.push_back(Hall(hall_name,rows,cols));
+		this->avaiable_halls.push_back(Hall(hall_name,rows,cols));
 		std::getline(file, buffer);
 	}
 	file.close();
-};
+}
 void Manager::file_open(const std::string& filename) {
 	validate_FileName(filename);
-	if (file.is_open()) {
-		throw std::logic_error("Another file has already been opend. Close it before opening a new one!");
+	if (access) {
+		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
 	}
 	file.clear();
 	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
@@ -57,11 +61,11 @@ void Manager::file_open(const std::string& filename) {
 	}
 	file.seekg(0, std::ios::beg);
 	access = true;
-	std::string category;
+	std::string line;
 	std::string EventName, Date, HallName;
 	struct TicketReader {
-		int Ticket_row, Ticket_seat, Ticket_ID;
-		std::string Ticket_status, Ticket_note;
+		int Ticket_row; int Ticket_seat; int Ticket_ID;
+		std::string Ticket_status; std::string Ticket_note;
 	};
 	std::vector<TicketReader> ticketList;
 	auto hallByIdx = [&](std::string name) -> Hall& {
@@ -72,73 +76,63 @@ void Manager::file_open(const std::string& filename) {
 		}
 		throw std::runtime_error("There isn't a hall with that name avaiable!");
 	};
-	while (true) {
-		std::getline(file>>std::ws, category, ':');
-		if (file.eof() || file.fail()) {
-			break;
-		}
-		if (category == "<EVENT START>") {
-			EventName.clear();
-			Date.clear();
-			HallName.clear();
-			ticketList.clear();
-			continue;
-		}
-		if (category == "<EVENT END>") {
-			if (EventName.empty() || Date.empty() || HallName.empty()) {
-				throw std::logic_error("Couldn't read information properly. Invalid argument!");
+	while (std::getline(file>>std::ws,line)) {
+		if (line == "<EVENT END>") {
+			if (!EventName.empty() || !Date.empty() || !HallName.empty()) {
+				if (EventName.empty() || Date.empty() || HallName.empty()) {
+					throw std::logic_error("Couldn't read information properly. Invalid argument!");
+				}
+				Event newEvent(EventName, Date, hallByIdx(HallName));
+				for (const auto& x : ticketList) {
+					newEvent.addTicket(x.Ticket_ID, x.Ticket_row, x.Ticket_seat, x.Ticket_status, x.Ticket_note);
+				}
+				this->info.push_back(newEvent);
 			}
-			Event newEvent(EventName, Date, hallByIdx(HallName));
-			info.push_back(newEvent);
 			EventName.clear();
 			Date.clear();
 			HallName.clear();
 			ticketList.clear();
 			continue;
 		}
+		size_t place = line.find(':');
+		std::string category = line.substr(0, place);
+		std::string value = line.substr(place + 1);
 		if (category == "Name") {
-			std::getline(file, EventName);
+			EventName = value;
 		}
-		if (category == "Date") {
-			std::getline(file, Date);
+		else if (category == "Date") {
+			Date = value;
 		}
-		if (category == "Hall") {
-			std::getline(file, HallName);
+		else if (category == "Hall") {
+			HallName = value;
 		}
-		if (category == "Tickets") {
-			std::string skip;
-			int position;
+		else if (category == "Tickets") {
 			while (true) {
-				file >> std::ws;
-				position = file.tellg();
-				std::getline(file, skip);
-				if (file.eof() || file.fail()) {
+				if (file.eof()) {
 					break;
 				}
-				if (skip == "<EVENT END>") {
+				int position = file.tellg();
+				std::getline(file>>std::ws,line);
+				if (line=="<EVENT END>") {
+					file.seekg(position);
 					break;
 				}
 				file.seekg(position);
 				TicketReader t;
-				file >> t.Ticket_ID >> t.Ticket_row >> t.Ticket_seat >> t.Ticket_status;
-				std::getline(file, t.Ticket_note);
-				ticketList.push_back(t);
+				if (file >> t.Ticket_ID >> t.Ticket_row >> t.Ticket_seat >> t.Ticket_status) {
+					std::getline(file, t.Ticket_note);
+					if (!t.Ticket_note.empty() && t.Ticket_note[0] == ' ') {
+						t.Ticket_note.erase(0, 1);
+					}
+					ticketList.push_back(t);
+				}
+				else {
+					break;
+				}
 			}
-			if (EventName.empty() || Date.empty() || HallName.empty()) {
-				throw std::logic_error("Couldn't read information properly. Invalid argument!");
-			}
-			Event newEvent(EventName, Date, hallByIdx(HallName));
-			for (TicketReader x : ticketList) {
-				newEvent.addTicket(x.Ticket_ID, x.Ticket_row, x.Ticket_seat, x.Ticket_status, x.Ticket_note);
-			}
-			info.push_back(newEvent);
-			EventName.clear();
-			Date.clear();
-			HallName.clear();
-			ticketList.clear();
 		}
 	}
-	file.close();
+	file.clear();
 	std::cout << "Successfully opened file " << filename << std::endl;
 }
 void Manager::file_close(const std::string& filename) {
@@ -159,10 +153,12 @@ void Manager::file_save(const std::string& filename) {
 	if (!file.is_open()) {
 		throw std::runtime_error("Access denied! File is in use or it can't be accessed!");
 	}
-	for (Event x : info) {
+	for (Event& x : info) {
 		file << x;
 	}
 	file.close();
+	file.clear();
+	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved file " << filename << std::endl;
 }
 void Manager::file_saveas(std::string& filename) {
@@ -176,7 +172,7 @@ void Manager::file_saveas(std::string& filename) {
 	if (!newFile.is_open()) {
 		throw std::runtime_error("Incorrect location input or you're trying to access prohibited area!");
 	}
-	for (Event x : info) {
+	for (Event& x : info) {
 		newFile << x;
 	}
 	filename = newName;
@@ -199,23 +195,26 @@ void Manager::addevent() {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
-
-	std::string name, date, hall_name;
-	std::cin >> date;
-	std::cin.ignore();
-	std::getline(std::cin, name);
-	std::getline(std::cin, hall_name);
-	isValidHall(hall_name);
-    isValidDate(date, hall_name);
-	isValidEventName(name);
-	auto hallByIdx = [&](std::string name) -> Hall& {
-		for (size_t i = 0; i < avaiable_halls.size(); i++) {
-			if (avaiable_halls[i].getName() == name) {
-				return avaiable_halls[i];
+	std::string name, date, hall_word, hallNum;
+		if (!(std::cin >> date >> hall_word >> hallNum)) {
+			throw std::invalid_argument("Invalid input format! Correct: addevent YYYY-MM-DD <hall_name> <event_name>");
+		}
+		std::string hall_name = hall_word + ' ' + hallNum;
+		std::cin >> std::ws;
+		std::getline(std::cin, name);
+		isValidHall(hall_name);
+		isValidDate(date, hall_name);
+		isValidEventName(name);
+		auto hallByIdx = [&](std::string name) -> Hall& {
+			for (size_t i = 0; i < avaiable_halls.size(); i++) {
+				if (avaiable_halls[i].getName() == name) {
+					return avaiable_halls[i];
+				}
 			}
-	}};
-	info.push_back(Event(name,date,hallByIdx(hall_name)));
-	std::cout << "Successfully added event:" << name<<std::endl;
+			throw std::runtime_error("There isn't a hall with that name avaiable!");
+			};
+		this->info.push_back(Event(name, date, hallByIdx(hall_name)));
+		std::cout << "Successfully added event:" << name << std::endl;
 }
 void Manager::isValidEventName(const std::string name) const {
 	if (name.empty()) {

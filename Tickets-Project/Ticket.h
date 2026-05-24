@@ -15,4 +15,9 @@ class Ticket {
 	static int ID_counter;
     public:
 		Ticket(const int, const int , const int ,const std::string , const std::string );
+		int getID() const;
+		int getRow() const;
+		int getSeat() const;
+		std::string getStatus() const;
+		std::string getNote() const;
 };
