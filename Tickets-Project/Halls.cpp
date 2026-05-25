@@ -10,9 +10,6 @@ Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_
 	std::string Hall::getName() const {
 		return this->name;
 	}
-	std::vector<Ticket>& Hall::getList() {
-		return this->list;
-	}
 	void Hall::saveTicket(const int row, const int col,const std::string status) {
 		int rowIdx = row - 1;
 		int colIdx = col - 1;
@@ -51,5 +48,14 @@ Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_
 		}
 		if (!foundAvaiable) {
 			std::cout << "No seats are avaiable!" << std::endl;;
+		}
+	}
+	std::string Hall::ticketStatus(const int row, const int col) {
+		TicketStatus currentStatus = this->seats[row-1][col-1];
+		switch (currentStatus) {
+		case TicketStatus::AVAIABLE: return "AVAIABLE";
+		case TicketStatus::RESERVED: return "RESERVED";
+		case TicketStatus::PURCHASED: return "PURCHASED";
+		default: throw std::invalid_argument("Seat with this parameters doesn't exist!");
 		}
 	}

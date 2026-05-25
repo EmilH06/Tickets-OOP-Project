@@ -11,13 +11,12 @@ class Ticket {
 	int seat;
 	TicketStatus status;
 	std::string note;
-	int ID;
-	static int ID_counter;
+	std::string uniqueCode = "none";
     public:
-		Ticket(const int, const int , const int ,const std::string , const std::string );
-		int getID() const;
+		Ticket(const std::string ,const int , const int ,const std::string , const std::string );
 		int getRow() const;
 		int getSeat() const;
 		std::string getStatus() const;
 		std::string getNote() const;
+		std::string getCode() const;
 };

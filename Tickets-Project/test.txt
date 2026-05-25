@@ -1,33 +1,6 @@
 <EVENT START>
-Name:Embail
-Date:2028-06-12
-Hall:Hall 1
-Tickets:
-106 5 5 RESERVED Hellow nigger"
-<EVENT END>
-<EVENT START>
-Name:PLEASE
-Date:2028-10-02
-Hall:Hall 2
-Tickets:
-104 5 6 PURCHASED Please dont't fuck me
-105 7 8 RESERVED EMbail
-<EVENT END>
-<EVENT START>
-Name:PLEASE ASGAIN
-Date:2026-05-12
-Hall:Hall 2
-Tickets:
-<EVENT END>
-<EVENT START>
-Name:NewTest
-Date:2026-10-24
-Hall:Hall 1
-Tickets:
-<EVENT END>
-<EVENT START>
-Name:Hello
-Date:2027-08-07
+Name:Embata
+Date:2028-11-10
 Hall:Hall 2
 Tickets:
 <EVENT END>

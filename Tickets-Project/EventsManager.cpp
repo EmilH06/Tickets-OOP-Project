@@ -21,14 +21,14 @@ void validate_FileName(const std::string& filename) {
 	}
 }
 std::ostream& operator<<(std::ostream& out, Event& information) {
-	std::vector<Ticket> copy = information.getHall().getList();
+	std::vector<Ticket> copy = information.getList();
 	out << "<EVENT START>" << '\n';
 	out << "Name:" << information.getName()<<'\n';
 	out << "Date:" << information.getDate() << '\n';
 	out << "Hall:" << information.getHallName() << '\n';
 	out << "Tickets:"<<'\n';
 	for (Ticket x : copy) {
-		out << x.getID() << ' ' << x.getRow() << ' ' << x.getSeat() << ' ' << x.getStatus() << ' ' << x.getNote() << '\n';
+		out <<x.getCode()<<' ' << x.getRow() << ' ' << x.getSeat() << ' ' << x.getStatus() << ' ' << x.getNote() << '\n';
 	}
 	out << "<EVENT END>"<<'\n';
 	return out;
@@ -67,8 +67,8 @@ void Manager::file_open(std::string& filename) {
 	std::string line;
 	std::string EventName, Date, HallName;
 	struct TicketReader {
-		int Ticket_row; int Ticket_seat; int Ticket_ID;
-		std::string Ticket_status; std::string Ticket_note;
+		int Ticket_row; int Ticket_seat;
+		std::string Ticket_status; std::string Ticket_note; std::string Ticket_code;
 	};
 	std::vector<TicketReader> ticketList;
 	auto hallByIdx = [&](std::string name) -> Hall& {
@@ -97,7 +97,7 @@ void Manager::file_open(std::string& filename) {
 				}
 				Event newEvent(EventName, Date, hallByIdx(HallName));
 				for (const auto& x : ticketList) {
-					newEvent.addTicket(x.Ticket_ID, x.Ticket_row, x.Ticket_seat, x.Ticket_status, x.Ticket_note);
+					newEvent.addTicket(x.Ticket_code,x.Ticket_row, x.Ticket_seat, x.Ticket_status, x.Ticket_note);
 				}
 				this->info.push_back(newEvent);
 			}
@@ -132,7 +132,7 @@ void Manager::file_open(std::string& filename) {
 				}
 				file.seekg(position);
 				TicketReader t;
-				if (file >> t.Ticket_ID >> t.Ticket_row >> t.Ticket_seat >> t.Ticket_status) {
+				if (file >>t.Ticket_code>>t.Ticket_row >> t.Ticket_seat >> t.Ticket_status) {
 					std::getline(file, t.Ticket_note);
 					if (!t.Ticket_note.empty() && t.Ticket_note[0] == ' ') {
 						t.Ticket_note.erase(0, 1);
@@ -268,6 +268,9 @@ void Manager::book() {
 	if (firstApp == std::string::npos || secondApp == std::string::npos) {
 		throw std::invalid_argument("The note should be enclosed in quotes, if your note is empty write <\"\"> ");
 	}
+	if (row < 0 || seat < 0) {
+		throw std::logic_error("The row and the seat can't be negative numbers");
+	}
 	std::string name = line.substr(0, firstApp-1);
 	std::string note = line.substr(firstApp, secondApp);
 	isValidEventName(name);
@@ -275,7 +278,32 @@ void Manager::book() {
 	for (int i = 0; i < info.size(); i++) {
 		if (name == info[i].getName() && date == info[i].getDate()) {
 			foundMatch = true;
-			info[i].addTicket(0, row, seat, "RESERVED", note);
+			info[i].addTicket("none",row, seat, "RESERVED", note);
+			break;
+		}
+	}
+	if (!foundMatch) {
+		throw std::invalid_argument("There isn't an event registered to this name and date!");
+	}
+	std::cout << "Successfully booked your seat!" << std::endl;
+}
+void Manager::unbook() {
+	int row, seat;
+	std::string date, name;
+	if (!(std::cin >> row >> seat >> date)) {
+		throw std::invalid_argument("Invalid input format! Correct: book <row> <seat> <date> <name> <\"note\">");
+	}
+	if (row < 0 || seat < 0) {
+		throw std::logic_error("The row and the seat can't be negative numbers");
+	}
+	std::cin >> std::ws;
+	std::getline(std::cin, name);
+	isValidEventName(name);
+	bool foundMatch = false;
+	for (int i = 0; i < info.size(); i++) {
+		if (name == info[i].getName() && date == info[i].getDate()) {
+			foundMatch = true;
+			info[i].removeTicket(row, seat);
 			break;
 		}
 	}

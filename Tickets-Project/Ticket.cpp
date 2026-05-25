@@ -1,8 +1,7 @@
 #include "Ticket.h"
 #include <iostream>
 #include <string>
-int Ticket::ID_counter = 100;
-Ticket::Ticket(const int currentID,const int row_, const int col_,const std::string status_,const std::string note_) : row(row_), seat(col_), note(note_){
+Ticket::Ticket(const std::string code,const int row_, const int col_, const std::string status_, const std::string note_) : row(row_), seat(col_), note(note_),uniqueCode(code) {
 	if (status_ == "RESERVED") {
 		this->status = TicketStatus::RESERVED;
 	}
@@ -12,14 +11,6 @@ Ticket::Ticket(const int currentID,const int row_, const int col_,const std::str
 	else if (status_ == "AVAIABLE") {
 		this->status = TicketStatus::AVAIABLE;
 	}
-	if (currentID != 0) {
-		ID_counter = currentID;
-	}
-	ID = ID_counter;
-	ID_counter++;
-}
-int Ticket::getID() const {
-	return this->ID;
 }
 int Ticket::getRow() const {
 	return this->row;
@@ -36,4 +27,7 @@ std::string Ticket::getStatus() const {
 }
 std::string Ticket::getNote() const {
 	return this->note;
+}
+std::string Ticket::getCode() const {
+	return uniqueCode;
 }

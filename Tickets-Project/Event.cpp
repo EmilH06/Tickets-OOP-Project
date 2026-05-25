@@ -1,5 +1,7 @@
 #include "Event.h"
+#include "Ticket.h"
 #include <iostream>
+#include <vector>
 Event::Event(const std::string name, const std::string date, const Hall& hall_) : name(name), date(date), hall(hall_) {}
 std::string Event::getDate() const {
 	return this->date;
@@ -13,13 +15,27 @@ std::string Event::getHallName() const {
 Hall& Event::getHall() {
 	return this->hall;
 }
-void Event::addTicket(const int ID,const int row, const int seat, const std::string status, const std::string note) {
-	this->hall.getList().push_back(Ticket(ID ,row, seat, status, note));
+std::vector<Ticket>& Event::getList() {
+	return list;
+}
+void Event::addTicket(const std::string code,const int row, const int seat, const std::string status, const std::string note) {
+	if (hall.ticketStatus(row, seat) != "AVAIABLE") {
+		throw std::logic_error("This seat has already been booked!");
+	}
+	Ticket ticket(code, row, seat, status, note);
+	this->list.push_back(ticket);
 	hall.saveTicket(row, seat, status);
+}
+void Event::removeTicket(const int row, const int col) {
+	for (size_t i = 0; i < list.size(); i++) {
+		if (list[i].getRow() == row && list[i].getSeat() == col) {
+			list.erase(list.begin() + i);
+			hall.saveTicket(row, col, "AVAIABLE");
+			return;
+		}
+	}
+	throw std::invalid_argument("Seat with these parameters doesn't exist!");
 }
 void Event::getFreeseats() {
 	hall.printFreeseats();
-}
-void Event::bookTicket() {
-
 }

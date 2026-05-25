@@ -52,6 +52,9 @@ int main() {
 		else if (command == "book") {
 			error_catcher([&]() {mainTask->book(); });
 		}
+		else if (command == "unbook") {
+			error_catcher([&]() {mainTask->unbook(); });
+		}
 		else {
 			std::cin.clear();
 			std::cin.ignore(1024, '\n');

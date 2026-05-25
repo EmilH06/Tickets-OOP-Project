@@ -22,11 +22,12 @@ public:
 	void addevent() ;
 	void freeseats();
 	void book();
+	void unbook();
 	void isValidDate (const std::string, const std::string) const;
 	void isValidHall(const std::string) const;
 	void isValidEventName(const std::string) const;
 	~Manager() {
-		if (!file.is_open()) {
+		if (file.is_open()) {
 			file.close();
 		}
 	}
