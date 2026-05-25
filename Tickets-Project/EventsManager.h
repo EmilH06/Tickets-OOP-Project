@@ -13,13 +13,15 @@ class Manager : public BasicCommand {
     std::vector<Hall> avaiable_halls;
 public:
 	Manager();
-	void file_open(const std::string&) override;
+	void file_open(std::string&) override;
 	void file_close(const std::string&) override;
 	void file_save(const std::string&) override;
 	void file_saveas(std::string&) override;
 	void help() const override;
 	void file_exit() override;
 	void addevent() ;
+	void freeseats();
+	void book();
 	void isValidDate (const std::string, const std::string) const;
 	void isValidHall(const std::string) const;
 	void isValidEventName(const std::string) const;

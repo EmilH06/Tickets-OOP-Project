@@ -12,4 +12,6 @@ public:
 	std::string getName() const;
 	std::string getHallName() const;
 	void addTicket(const int,const int, const int, const std::string, const std::string);
+	void getFreeseats();
+	void bookTicket();
 };

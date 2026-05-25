@@ -15,4 +15,11 @@ Hall& Event::getHall() {
 }
 void Event::addTicket(const int ID,const int row, const int seat, const std::string status, const std::string note) {
 	this->hall.getList().push_back(Ticket(ID ,row, seat, status, note));
+	hall.saveTicket(row, seat, status);
+}
+void Event::getFreeseats() {
+	hall.printFreeseats();
+}
+void Event::bookTicket() {
+
 }

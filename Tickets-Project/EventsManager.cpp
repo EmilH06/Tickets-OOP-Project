@@ -22,6 +22,7 @@ void validate_FileName(const std::string& filename) {
 }
 std::ostream& operator<<(std::ostream& out, Event& information) {
 	std::vector<Ticket> copy = information.getHall().getList();
+	out << "<EVENT START>" << '\n';
 	out << "Name:" << information.getName()<<'\n';
 	out << "Date:" << information.getDate() << '\n';
 	out << "Hall:" << information.getHallName() << '\n';
@@ -49,11 +50,13 @@ Manager::Manager(){
 	}
 	file.close();
 }
-void Manager::file_open(const std::string& filename) {
-	validate_FileName(filename);
+void Manager::file_open(std::string& filename) {
 	if (access) {
+		std::cin.ignore(1024, '\n');
 		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
 	}
+	std::cin >> filename;
+	validate_FileName(filename);
 	file.clear();
 	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
 	if (!file.is_open()) {
@@ -77,6 +80,16 @@ void Manager::file_open(const std::string& filename) {
 		throw std::runtime_error("There isn't a hall with that name avaiable!");
 	};
 	while (std::getline(file>>std::ws,line)) {
+		if (file.eof() || file.fail()) {
+			break;
+		}
+		if (line == "<EVENT START>") {
+			EventName.clear();
+			Date.clear();
+			HallName.clear();
+			ticketList.clear();
+			continue;
+		}
 		if (line == "<EVENT END>") {
 			if (!EventName.empty() || !Date.empty() || !HallName.empty()) {
 				if (EventName.empty() || Date.empty() || HallName.empty()) {
@@ -127,7 +140,7 @@ void Manager::file_open(const std::string& filename) {
 					ticketList.push_back(t);
 				}
 				else {
-					break;
+					throw std::invalid_argument("Couldn't load the Ticket information!");
 				}
 			}
 		}
@@ -197,7 +210,7 @@ void Manager::addevent() {
 	}
 	std::string name, date, hall_word, hallNum;
 		if (!(std::cin >> date >> hall_word >> hallNum)) {
-			throw std::invalid_argument("Invalid input format! Correct: addevent YYYY-MM-DD <hall_name> <event_name>");
+			throw std::invalid_argument("Invalid input format! Correct: addevent <YYYY-MM-DD> <hall_name> <event_name>");
 		}
 		std::string hall_name = hall_word + ' ' + hallNum;
 		std::cin >> std::ws;
@@ -215,6 +228,61 @@ void Manager::addevent() {
 			};
 		this->info.push_back(Event(name, date, hallByIdx(hall_name)));
 		std::cout << "Successfully added event:" << name << std::endl;
+}
+void Manager::freeseats() {
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
+	}
+	std::string name, date;
+	bool foundMatch = false;
+	if (!(std::cin >> date)) {
+		throw std::invalid_argument("Invalid input format! Correct: freeseats <YYYY-MM-DD> <name>");
+	}
+	std::cin >> std::ws;
+	std::getline(std::cin,name);
+	isValidEventName(name);
+	for (int i = 0; i < info.size(); i++) {
+		if (name == info[i].getName() && date == info[i].getDate()) {
+			foundMatch = true;
+			info[i].getFreeseats();
+			return;
+		}
+	}
+	if (!foundMatch) {
+		throw std::invalid_argument("There isn't an event registered to this name and date!");
+	}
+}
+void Manager::book() {
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
+	}
+	int row, seat;
+	std::string date, line;
+	if (!(std::cin >> row >> seat >> date)) {
+		throw std::invalid_argument("Invalid input format! Correct: book <row> <seat> <date> <name> <\"note\">");
+	}
+	std::cin >> std::ws;
+	std::getline(std::cin, line);
+	size_t firstApp = line.find('"');
+	size_t secondApp = line.find('"', firstApp + 1);
+	if (firstApp == std::string::npos || secondApp == std::string::npos) {
+		throw std::invalid_argument("The note should be enclosed in quotes, if your note is empty write <\"\"> ");
+	}
+	std::string name = line.substr(0, firstApp-1);
+	std::string note = line.substr(firstApp, secondApp);
+	isValidEventName(name);
+	bool foundMatch = false;
+	for (int i = 0; i < info.size(); i++) {
+		if (name == info[i].getName() && date == info[i].getDate()) {
+			foundMatch = true;
+			info[i].addTicket(0, row, seat, "RESERVED", note);
+			break;
+		}
+	}
+	if (!foundMatch) {
+		throw std::invalid_argument("There isn't an event registered to this name and date!");
+	}
+	std::cout << "Successfully booked your seat!" << std::endl;
 }
 void Manager::isValidEventName(const std::string name) const {
 	if (name.empty()) {

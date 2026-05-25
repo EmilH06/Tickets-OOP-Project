@@ -25,8 +25,7 @@ int main() {
 	Manager* mainTask = new Manager();
 	while (std::cout << "> " && std::cin >> command) {
 	    if (command == "open") {
-				std::cin >> filename;
-				error_catcher([&]() {mainTask->file_open(filename); });
+		    error_catcher([&]() {mainTask->file_open(filename); });
 	    }
 		else if (command == "close") {
 			error_catcher([&]() {mainTask->file_close(filename); });
@@ -47,7 +46,15 @@ int main() {
 		else if (command == "addevent") {
 			error_catcher([&]() {mainTask->addevent(); });
 		}
+		else if (command == "freeseats") {
+			error_catcher([&]() {mainTask->freeseats(); });
+		}
+		else if (command == "book") {
+			error_catcher([&]() {mainTask->book(); });
+		}
 		else {
+			std::cin.clear();
+			std::cin.ignore(1024, '\n');
 			std::cout << "Invalid command! Please use the allowed commands!" << std::endl;
 		}
 	}

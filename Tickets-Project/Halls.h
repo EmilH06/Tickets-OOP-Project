@@ -18,5 +18,6 @@ public:
 	Hall(const std::string name_, const int, const int);
 	std::vector<Ticket>& getList();
 	std::string getName() const;
-	void saveTicket(const int, const int, const TicketStatus);
+	void saveTicket(const int, const int, const std::string status);
+	void printFreeseats();
 };
