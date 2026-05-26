@@ -19,5 +19,4 @@ public:
 	void saveTicket(const int, const int, const std::string status);
 	void printFreeseats();
 	std::string ticketStatus(const int, const int);
-	void changeStatus(const int, const int,std::string);
 };

@@ -18,4 +18,5 @@ public:
 	void addTicket(const std::string, const int, const int, const std::string, const std::string);
 	void removeTicket(const int, const int);
 	void getFreeseats();
+	void purchaseTicket(const std::string, const int, const int,const std::string);
 };

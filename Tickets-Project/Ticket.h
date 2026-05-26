@@ -2,14 +2,9 @@
 #include <iostream>
 #include <string>
 class Ticket {
-	enum class TicketStatus {
-		AVAIABLE = 0,
-		RESERVED = 1,
-		PURCHASED = 2
-	};
     int row;
 	int seat;
-	TicketStatus status;
+	std::string status;
 	std::string note;
 	std::string uniqueCode = "none";
     public:
@@ -19,4 +14,6 @@ class Ticket {
 		std::string getStatus() const;
 		std::string getNote() const;
 		std::string getCode() const;
+		void setStatus(std::string);
+		void generateCode(std::string);
 };

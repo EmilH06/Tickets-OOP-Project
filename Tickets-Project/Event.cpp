@@ -22,11 +22,13 @@ void Event::addTicket(const std::string code,const int row, const int seat, cons
 	if (hall.ticketStatus(row, seat) != "AVAIABLE") {
 		throw std::logic_error("This seat has already been booked!");
 	}
-	Ticket ticket(code, row, seat, status, note);
-	this->list.push_back(ticket);
+	this->list.push_back(Ticket(code, row, seat, status, note));
 	hall.saveTicket(row, seat, status);
 }
 void Event::removeTicket(const int row, const int col) {
+	if (hall.ticketStatus(row, col) == "AVAIABLE") {
+		throw std::logic_error("This seat is already avaiable!");
+	}
 	for (size_t i = 0; i < list.size(); i++) {
 		if (list[i].getRow() == row && list[i].getSeat() == col) {
 			list.erase(list.begin() + i);
@@ -38,4 +40,26 @@ void Event::removeTicket(const int row, const int col) {
 }
 void Event::getFreeseats() {
 	hall.printFreeseats();
+}
+void Event::purchaseTicket(const std::string date, const int row, const int seat, const std::string note) {
+	if (hall.ticketStatus(row, seat) == "AVAIABLE") {
+		Ticket t("none", row, seat, "PURCHASED", note);
+		t.generateCode(date);
+		this->list.push_back(t);
+		hall.saveTicket(row, seat, "PURCHASED");
+	}
+	else if (hall.ticketStatus(row, seat) == "RESERVED") {
+		size_t Idx = -1;
+		for (size_t i = 0; i < list.size(); i++) {
+			if (list[i].getRow() == row && list[i].getSeat() == seat) {
+				Idx = i;
+			}
+		}
+		list[Idx].generateCode(date);
+		list[Idx].setStatus("PURCHASED");
+		hall.saveTicket(row, seat, "PURCHASED");
+	}
+	else if (hall.ticketStatus(row, seat) == "PURCHASED") {
+		throw std::logic_error("Ticket has already been purchased!");
+	}
 }

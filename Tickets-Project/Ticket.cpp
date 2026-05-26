@@ -2,14 +2,11 @@
 #include <iostream>
 #include <string>
 Ticket::Ticket(const std::string code,const int row_, const int col_, const std::string status_, const std::string note_) : row(row_), seat(col_), note(note_),uniqueCode(code) {
-	if (status_ == "RESERVED") {
-		this->status = TicketStatus::RESERVED;
+	if (status_ == "AVAIABLE" || status_ == "RESERVED" || status_ == "PURCHASED") {
+		status = status_;
 	}
-	else if (status_ == "PURCHASED") {
-		this->status = TicketStatus::PURCHASED;
-	}
-	else if (status_ == "AVAIABLE") {
-		this->status = TicketStatus::AVAIABLE;
+	else {
+		throw std::invalid_argument("Invalid ticket status!");
 	}
 }
 int Ticket::getRow() const {
@@ -19,15 +16,20 @@ int Ticket::getSeat() const {
 	return this->seat;
 }
 std::string Ticket::getStatus() const {
-	switch (this->status) {
-	case TicketStatus::AVAIABLE: return "AVAIABLE";
-	case TicketStatus::RESERVED: return "RESERVED";
-	case TicketStatus::PURCHASED: return "PURCHASED";
-	}
+	return this->status;
 }
 std::string Ticket::getNote() const {
 	return this->note;
 }
 std::string Ticket::getCode() const {
 	return uniqueCode;
+}
+void Ticket::setStatus(std::string other_status) {
+	status = other_status;
+}
+void Ticket::generateCode(std::string date) {
+	for (int i = 0; i < date.size(); i++) {
+		if (date[i] == '-') { date.erase(i, 1); i--; }
+	}
+	uniqueCode = date +( "-R" + std::to_string(row) + "-S" + std::to_string(seat) +"-H12O4");
 }
