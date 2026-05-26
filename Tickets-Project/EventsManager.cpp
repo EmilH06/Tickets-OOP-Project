@@ -264,23 +264,13 @@ void Manager::freeseats() {
 		throw std::logic_error("You haven't open any file!");
 	}
 	std::string name, date;
-	bool foundMatch = false;
 	if (!(std::cin >> date)) {
 		throw std::invalid_argument("Invalid input format! Correct: freeseats <YYYY-MM-DD> <name>");
 	}
 	std::cin >> std::ws;
 	std::getline(std::cin,name);
 	isValidEventName(name);
-	for (int i = 0; i < info.size(); i++) {
-		if (name == info[i].getName() && date == info[i].getDate()) {
-			foundMatch = true;
-			info[i].getFreeseats();
-			return;
-		}
-	}
-	if (!foundMatch) {
-		throw std::invalid_argument("There isn't an event registered to this name and date!");
-	}
+	functionApply(name, date, [&](Event& e)->void {e.getFreeseats(); });
 }
 void Manager::book() {
 	BookingInfo info;
@@ -317,6 +307,17 @@ void Manager::buy() {
 	isValidEventName(info.name);
 	functionApply(info.name, info.date, [&](Event& e)->void { e.purchaseTicket(info.date, info.row, info.seat, info.note); });
 	std::cout << "Successfully purchased your seat!" << std::endl;
+}
+void Manager::bookings() {
+	std::string name, date;
+	if (!(std::cin >> date)) {
+		throw std::invalid_argument("Invalid input format! Correct: freeseats [<YYYY-MM-DD>] [<name>]");
+	}
+	std::cin >> std::ws;
+	std::getline(std::cin, name);
+	if (!name.empty() && !date.empty()) {
+		throw std::invalid_argument("Invalid input format! At least one of the parameters should ba a non empty input!");
+	}
 }
 void Manager::isValidEventName(const std::string name) const {
 	if (name.empty()) {

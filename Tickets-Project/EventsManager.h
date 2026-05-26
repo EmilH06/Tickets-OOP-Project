@@ -26,6 +26,7 @@ public:
 	void book();
 	void unbook();
 	void buy();
+	void bookings();
 	void isValidDate (const std::string, const std::string) const;
 	void isValidHall(const std::string) const;
 	void isValidEventName(const std::string) const;
