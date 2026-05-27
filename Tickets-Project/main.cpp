@@ -58,7 +58,16 @@ int main() {
 		else if (command == "buy") {
 			error_catcher([&]() {mainTask->buy(); });
 		}
-		else {
+		else if (command == "bookings") {
+			error_catcher([&]() {mainTask->bookings(); });
+		}
+		else if (command == "check") {
+			error_catcher([&]() {mainTask->check(); });
+		}
+		else if (command == "report") {
+			error_catcher([&]() {mainTask->report(); });
+		}
+		else{
 			std::cin.clear();
 			std::cin.ignore(1024, '\n');
 			std::cout << "Invalid command! Please use the allowed commands!" << std::endl;

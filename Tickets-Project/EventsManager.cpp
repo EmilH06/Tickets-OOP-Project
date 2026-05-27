@@ -221,13 +221,25 @@ void Manager::file_saveas(std::string& filename) {
 	filename = newName;
 	newFile.close();
 	file.close();
+	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved another " << filename << std::endl;
 }
 void Manager::help() const{
-	std::cout << "The following commands are supported:\n" << "open <file>   - opens <file>\n" <<
-		"close         - closes currently opened file\n" << "save          - saves the currently opened file\n" <<
-		"saveas <file> - saves the currently opened file in <file>\n" << "help          - prints this information\n" <<
-		"exit          - exits the program\n";
+	std::cout << "The following commands are supported:\n" << 
+		"open <file>                             - opens <file>\n" <<
+		"close                                   - closes currently opened file\n" <<
+		"save                                    - saves the currently opened file\n" <<
+		"saveas <file>                           - saves the currently opened file in <file>\n" <<
+		"help                                    - prints this information\n" <<
+		"exit                                    - exits the program\n" <<
+		"addevent <date> <hall> <name>           - adds a new performance to the list unless the date is already reserved\n" <<
+		"freeseats <date> < name>                - prints out a list of all avaiable seats on that date and performance name\n" <<
+		"book <row> <seat> <date> <name> < note> - books a new ticket with these atributes. For empty note write \"\"\n" <<
+		"unbook <row> <seat> <date> < name>      - cancels the reservation\n" <<
+		"buy <row> < seat > <date> < name>       - purchases a new ticket with these atributes\n" <<
+		"bookings [<date>] [<name>]              - prints a list of all reserved tickets. Either date or the name are optional\n" <<
+		"check <code>                            - prints out the row and seat of a ticket, using the unique code each ticket has\n" <<
+		"report <from> <to> [<hall>]             - prints the information for all performances with a date, between your inputs\n";
 }
 void Manager::file_exit() {
 	access = false;
@@ -246,7 +258,8 @@ void Manager::addevent() {
 		std::cin >> std::ws;
 		std::getline(std::cin, name);
 		isValidHall(hall_name);
-		isValidDate(date, hall_name);
+		isValidDate(date);
+		isAvaiableDate(date, hall_name);
 		isValidEventName(name);
 		auto hallByIdx = [&](std::string name) -> Hall& {
 			for (size_t i = 0; i < avaiable_halls.size(); i++) {
@@ -260,9 +273,6 @@ void Manager::addevent() {
 		std::cout << "Successfully added event:" << name << std::endl;
 }
 void Manager::freeseats() {
-	if (!access) {
-		throw std::logic_error("You haven't open any file!");
-	}
 	std::string name, date;
 	if (!(std::cin >> date)) {
 		throw std::invalid_argument("Invalid input format! Correct: freeseats <YYYY-MM-DD> <name>");
@@ -305,18 +315,96 @@ void Manager::buy() {
 	std::cin >> std::ws;
 	std::getline(std::cin, info.name);
 	isValidEventName(info.name);
-	functionApply(info.name, info.date, [&](Event& e)->void { e.purchaseTicket(info.date, info.row, info.seat, info.note); });
+	functionApply(info.name, info.date, [&](Event& e)->void { e.purchaseTicket(info.name,info.date, info.row, info.seat, info.note); });
 	std::cout << "Successfully purchased your seat!" << std::endl;
 }
 void Manager::bookings() {
-	std::string name, date;
-	if (!(std::cin >> date)) {
-		throw std::invalid_argument("Invalid input format! Correct: freeseats [<YYYY-MM-DD>] [<name>]");
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
 	}
+	std::string line;
+	std::string name, date;
 	std::cin >> std::ws;
-	std::getline(std::cin, name);
+	std::getline(std::cin, line);
+	size_t spacePos = line.find(' ');
+	if (spacePos != std::string::npos) {
+		date = line.substr(0, spacePos);
+		name = line.substr(spacePos + 1);
+	}
+	else if (!line.empty()) {
+		if (line.find('-') != std::string::npos && line.length()==10) { date = line; }
+		else { name = line; }
+	}
+	else if (line.empty()) {
+		throw std::logic_error("Invalid input! You should input at least a date or a name!");
+	}
+	bool foundMatch = false;
 	if (!name.empty() && !date.empty()) {
-		throw std::invalid_argument("Invalid input format! At least one of the parameters should ba a non empty input!");
+		functionApply(name, date, [&](Event& e)->void { e.getBookedSeats(); });
+		return;
+	}
+	else if (!name.empty() && date.empty()) {
+		for (int i = 0; i < info.size(); i++) {
+			if (name == info[i].getName()) {
+				foundMatch = true;
+				info[i].getBookedSeats();
+				break;
+			}
+		}
+	}
+	else if(name.empty() && !date.empty() ){
+		for (int i = 0; i < info.size(); i++) {
+			if (date == info[i].getDate()) {
+				foundMatch = true;
+				info[i].getBookedSeats();
+				break;
+			}
+		}
+	}
+	if (!foundMatch) {
+		throw std::invalid_argument("There isn't an event registered to this name or date!");
+	}
+}
+void Manager::check() {
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
+	}
+	std::string code;
+	if (!(std::cin >> code)) {
+		throw std::invalid_argument("Invalid input format! Correct: check <code>");
+	}
+	for (Event e : info) {
+		if (e.checkCode(code)) {
+			return;
+		}
+	}
+	throw std::logic_error("Invalid ticket code");
+}
+void Manager::report() {
+	if (!access) {
+		throw std::logic_error("You haven't open any file!");
+	}
+	std::string from, to, hallname;
+	if (!(std::cin >> from>>to)) {
+		throw std::invalid_argument("Invalid input format! Correct: report <from> <to> [<hall>]");
+	}
+	std::getline(std::cin, hallname);
+	isValidDate(from);
+	isValidDate(to);
+	if (!hallname.empty()) {
+		isValidHall(hallname);
+		std::cout << "LIST OF EVENT FROM " << hallname << std::endl;;
+		for (int i = 0; i < info.size(); i++) {
+			if (hallname == info[i].getHallName()) {
+				info[i].getReport(from,to);
+			}
+		}
+	}
+	else {
+		std::cout << "LIST OF ALL EVENTS" << std::endl;
+		for (int i = 0; i < info.size(); i++) {
+				info[i].getReport(from, to);
+		}
 	}
 }
 void Manager::isValidEventName(const std::string name) const {
@@ -330,16 +418,7 @@ void Manager::isValidHall(const std::string hall) const {
 		throw std::invalid_argument("There isn't avaiable hall with that name!");
 	}
 }
-void Manager::isValidDate(const std::string date, const std::string hall_name) const {
-	auto matchingDates = [&]()->bool {
-		for (Event x: info){
-			std::string other = x.getDate();
-			if (hall_name==x.getHallName() &&date.substr(0, 4) == other.substr(0, 4) && date.substr(5, 2) == other.substr(5, 2) && date.substr(8, 2) == other.substr(8, 2)) {
-				return true;
-			}
-		}
-		return false;
-	};
+void Manager::isValidDate(const std::string date) const {
 	if (date.size() != 10) {
 		throw std::invalid_argument("Invalid date format. Input should have 10 symbols!");
 	}
@@ -376,10 +455,21 @@ void Manager::isValidDate(const std::string date, const std::string hall_name) c
 		default: throw std::invalid_argument("Invalid date format. The mouth should be betweemn 1 and 12");
 		}
 		return false;
-	};
+		};
 	if (!validDay()) {
 		throw std::invalid_argument("Invalid date format. This mouth doesn't have that many days!");
 	}
+}
+void Manager::isAvaiableDate(const std::string date, const std::string hall_name) const {
+	auto matchingDates = [&]()->bool {
+		for (Event x : info) {
+			std::string other = x.getDate();
+			if (hall_name == x.getHallName() && date.substr(0, 4) == other.substr(0, 4) && date.substr(5, 2) == other.substr(5, 2) && date.substr(8, 2) == other.substr(8, 2)) {
+				return true;
+			}
+		}
+		return false;
+		};
 	if (matchingDates()) {
 		throw std::invalid_argument("Invalid date format. This date has already been reserved!");
 	}

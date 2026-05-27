@@ -15,5 +15,5 @@ class Ticket {
 		std::string getNote() const;
 		std::string getCode() const;
 		void setStatus(std::string);
-		void generateCode(std::string);
+		void generateCode(std::string,std::string);
 };

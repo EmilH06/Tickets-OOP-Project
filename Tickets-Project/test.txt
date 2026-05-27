@@ -1,9 +1,0 @@
-<EVENT START>
-Name:Embata
-Date:2028-11-10
-Hall:Hall 2
-Tickets:
-20281110-R6-S7-H12O4 6 7 RESERVED ""
-none 8 9 RESERVED "" 
-2028ÿ 11 12 RESERVED "" 
-<EVENT END>

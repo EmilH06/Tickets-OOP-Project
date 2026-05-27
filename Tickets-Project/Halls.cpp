@@ -10,6 +10,35 @@ Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_
 	std::string Hall::getName() const {
 		return this->name;
 	}
+	int Hall::getRows() const{
+		return rows;
+	}
+	int Hall::getSeats() const {
+		return cols;
+	}
+	void Hall::printByStatus(const TicketStatus temp_status) {
+		bool foundAvaiable = false;
+		for (size_t i = 0; i < seats.size(); i++) {
+			bool foundBySeat = false;
+			std::cout << "Row " << i + 1 << std::endl;
+			std::cout << "Seats: ";
+			for (size_t j = 0; j < seats[i].size(); j++) {
+				if (seats[i][j] == temp_status) {
+					foundAvaiable = true;
+					foundBySeat = true;
+					std::cout << j + 1;
+					if (j < seats[i].size() - 1) { std::cout << ", "; }
+				}
+			}
+			if (!foundBySeat) {
+				std::cout << "None";
+			}
+			std::cout << std::endl;
+		}
+		if (!foundAvaiable) {
+			std::cout << "No seats are avaiable!" << std::endl;;
+		}
+	}
 	void Hall::saveTicket(const int row, const int col,const std::string status) {
 		int rowIdx = row - 1;
 		int colIdx = col - 1;
@@ -28,29 +57,12 @@ Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_
 		else { throw std::invalid_argument("Incorrect ticket status input!"); }
 	}
 	void Hall::printFreeseats() {
-		bool foundAvaiable = false;
-		for (size_t i = 0; i < seats.size(); i++) {
-			bool foundBySeat = false;
-			std::cout << "Row " << i + 1 << std::endl;
-			std::cout << "Seats: ";
-			for (size_t j = 0; j < seats[i].size(); j++) {
-				if (seats[i][j] == TicketStatus::AVAIABLE) {
-					foundAvaiable = true;
-					foundBySeat = true;
-					std::cout << j + 1;
-					if (j != seats[i].size() - 1) { std::cout << ", "; }
-				}
-			}
-			if (!foundBySeat) {
-				std::cout << "None";
-			}
-			std::cout << std::endl;
-		}
-		if (!foundAvaiable) {
-			std::cout << "No seats are avaiable!" << std::endl;;
-		}
+		printByStatus(TicketStatus::AVAIABLE);
 	}
-	std::string Hall::ticketStatus(const int row, const int col) {
+	void Hall::printBookedSeats() {
+		printByStatus(TicketStatus::RESERVED);
+	}
+	std::string Hall::getTicketStatus(const int row, const int col) {
 		TicketStatus currentStatus = this->seats[row-1][col-1];
 		switch (currentStatus) {
 		case TicketStatus::AVAIABLE: return "AVAIABLE";

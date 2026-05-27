@@ -27,9 +27,12 @@ std::string Ticket::getCode() const {
 void Ticket::setStatus(std::string other_status) {
 	status = other_status;
 }
-void Ticket::generateCode(std::string date) {
+void Ticket::generateCode(std::string name,std::string date) {
 	for (int i = 0; i < date.size(); i++) {
 		if (date[i] == '-') { date.erase(i, 1); i--; }
 	}
-	uniqueCode = date +( "-R" + std::to_string(row) + "-S" + std::to_string(seat) +"-H12O4");
+	for (int i = 0; i < name.size(); i++) {
+		if (name[i] == ' ') { name.erase(i, 1); i--; }
+	}
+	uniqueCode = date + name + std::to_string(row)+"-"+std::to_string(seat);
 }
