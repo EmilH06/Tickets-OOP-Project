@@ -67,6 +67,12 @@ int main() {
 		else if (command == "report") {
 			error_catcher([&]() {mainTask->report(); });
 		}
+		else if (command == "mostviewed") {
+			error_catcher([&]() {mainTask->mostviewed(); });
+		}
+		else if (command == "attendence") {
+			error_catcher([&]() {mainTask->attendence(); });
+		}
 		else{
 			std::cin.clear();
 			std::cin.ignore(1024, '\n');

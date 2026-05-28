@@ -17,10 +17,10 @@ public:
 	Hall(const std::string name_, const int, const int);
 	std::string getName() const;
 	int getRows() const;
-	int getSeats() const;
-	void printByStatus(const TicketStatus);
-	void saveTicket(const int, const int, const std::string status);
-	void printFreeseats();
-	void printBookedSeats();
-	std::string getTicketStatus(const int, const int);
+	int getCols() const;
+	void printByStatus(const TicketStatus&) const;
+	void saveTicket(const int&, const int&, const std::string& status);
+	void printFreeseats() const;
+	void printBookedSeats() const;
+	std::string getTicketStatus(const int&, const int&);
 };

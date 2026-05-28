@@ -19,6 +19,7 @@ public:
 	void removeTicket(const int, const int);
 	void getFreeseats();
 	void getBookedSeats();
+	bool getAttendence(const std::string, const std::string);
 	bool checkCode(const std::string&);
 	void getReport(const std::string, const std::string);
 	void purchaseTicket(const std::string, const std::string, const int, const int, const std::string);

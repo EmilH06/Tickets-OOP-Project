@@ -29,6 +29,8 @@ public:
 	void bookings();
 	void check();
 	void report();
+	void mostviewed();
+	void attendence();
 	void isValidDate (const std::string) const;
 	void isAvaiableDate(const std::string, const std::string) const;
 	void isValidHall(const std::string) const;

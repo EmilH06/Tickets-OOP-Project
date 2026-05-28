@@ -44,6 +44,18 @@ void Event::getFreeseats() {
 void Event::getBookedSeats() {
 		hall.printBookedSeats();
 }
+bool Event::getAttendence(const std::string from, const std::string to) {
+	if (from <= date && date <= to) {
+		double percent = (this->list.size() / (hall.getRows() * hall.getCols())) * 100;
+		if (percent <= 10.00) {
+			return true;
+			std::cout << "Event: " << name << '\n';
+			std::cout << "Attendence: " << percent << '\n';
+		}
+	}
+	std::cout << std::endl;
+	return false;
+}
 bool Event::checkCode(const std::string& code) {
 	if (code == "none") {
 		throw std::logic_error("Invalid ticket code");
