@@ -9,12 +9,14 @@ class Hall {
 		RESERVED = 1,
 		PURCHASED = 2
 	};
-	const std::string name;
+	std::string name;
 	std::vector<std::vector<TicketStatus>> seats;
 	int rows = 0;
 	int cols = 0;
 public:
+	Hall() = default;
 	Hall(const std::string name_, const int, const int);
+	Hall(const Hall& other);
 	std::string getName() const;
 	int getRows() const;
 	int getCols() const;
@@ -23,4 +25,5 @@ public:
 	void printFreeseats() const;
 	void printBookedSeats() const;
 	std::string getTicketStatus(const int&, const int&);
+	Hall& operator=(const Hall& other);
 };

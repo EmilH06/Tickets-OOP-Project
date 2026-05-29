@@ -23,6 +23,9 @@ int main() {
 	std::string command;
 	std::string filename;
 	Manager* mainTask = new Manager();
+	std::cout << "===========================================" << std::endl;
+	std::cout << "   TICKET ORGANIZER HAS BEEN OPENED        " << std::endl;
+	std::cout << "   Input commands to manage your events.\n   " << std::endl;
 	while (std::cout << "> " && std::cin >> command) {
 	    if (command == "open") {
 		    error_catcher([&]() {mainTask->file_open(filename); });

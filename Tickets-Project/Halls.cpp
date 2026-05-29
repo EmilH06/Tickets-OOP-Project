@@ -7,6 +7,9 @@
 Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_), rows(row_), cols(col_) {
 	seats.resize(rows, std::vector<TicketStatus>(cols, TicketStatus::AVAIABLE));
 }
+Hall::Hall(const Hall& other) {
+	*this = other;
+}
 	std::string Hall::getName() const {
 		return this->name;
 	}
@@ -70,4 +73,14 @@ Hall::Hall(const std::string name_, const int row_, const int col_) : name(name_
 		case TicketStatus::PURCHASED: return "PURCHASED";
 		default: throw std::invalid_argument("Seat with these parameters doesn't exist!");
 		}
+	}
+	Hall& Hall::operator=(const Hall& other) {
+		if (this == &other) {
+			return *this;
+		}
+		this->name = other.name;
+		this->seats = other.seats;
+		this->rows = other.rows;
+		this->cols = other.cols;
+		return *this;
 	}

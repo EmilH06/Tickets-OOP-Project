@@ -2,7 +2,10 @@
 #include "Ticket.h"
 #include <iostream>
 #include <vector>
-Event::Event(const std::string name, const std::string date, const Hall& hall_) : name(name), date(date), hall(hall_) {}
+Event::Event(const std::string name, const std::string date, const Hall hall_) : name(name), date(date), hall(hall_) {}
+Event::Event(const Event& other) {
+	*this = other;
+}
 std::string Event::getDate() const {
 	return this->date;
 }
@@ -12,11 +15,8 @@ std::string Event::getName() const {
 std::string Event::getHallName() const {
 	return this->hall.getName();
 }
-Hall& Event::getHall() {
-	return this->hall;
-}
-std::vector<Ticket>& Event::getList() {
-	return list;
+std::vector<Ticket> Event::getList() {
+	return this->list;
 }
 void Event::addTicket(const std::string code,const int row, const int seat, const std::string status, const std::string note) {
 	if (hall.getTicketStatus(row, seat) != "AVAIABLE") {
@@ -98,4 +98,14 @@ void Event::purchaseTicket(const std::string name,const std::string date, const 
 	else if (hall.getTicketStatus(row, seat) == "PURCHASED") {
 		throw std::logic_error("Ticket has already been purchased!");
 	}
+}
+Event& Event::operator=(const Event& other) {
+	if (this == &other) {
+		return *this;
+	}
+	this->name = other.name;
+	this->date = other.date;
+	this->hall = other.hall;
+	this->list = other.list;
+	return *this;
 }

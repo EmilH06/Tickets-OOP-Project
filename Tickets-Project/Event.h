@@ -9,12 +9,12 @@ class Event {
 	Hall hall;
 	std::vector<Ticket> list;
 public:
-	Event(const std::string name, const std::string date, const Hall& hall_);
-	Hall& getHall();
+	Event(const std::string name, const std::string date, const Hall hall_);
+	Event(const Event&);
 	std::string getDate() const;
 	std::string getName() const;
 	std::string getHallName() const;
-	std::vector<Ticket>& getList();
+	std::vector<Ticket> getList();
 	void addTicket(const std::string, const int, const int, const std::string, const std::string);
 	void removeTicket(const int, const int);
 	void getFreeseats();
@@ -23,4 +23,5 @@ public:
 	bool checkCode(const std::string&);
 	void getReport(const std::string, const std::string);
 	void purchaseTicket(const std::string, const std::string, const int, const int, const std::string);
+	Event& operator=(const Event&);
 };

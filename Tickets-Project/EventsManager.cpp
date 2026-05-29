@@ -224,24 +224,24 @@ void Manager::file_saveas(std::string& filename) {
 	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved another " << filename << std::endl;
 }
-void Manager::help() const{
-	std::cout << "The following commands are supported:\n" <<
-		"open <file>                             - opens <file>\n" <<
-		"close                                   - closes currently opened file\n" <<
-		"save                                    - saves the currently opened file\n" <<
-		"saveas <file>                           - saves the currently opened file in <file>\n" <<
-		"help                                    - prints this information\n" <<
-		"exit                                    - exits the program\n" <<
-		"addevent <date> <hall> <name>           - adds a new performance to the list unless the date is already reserved\n" <<
-		"freeseats <date> < name>                - prints out a list of all avaiable seats on that date and performance name\n" <<
-		"book <row> <seat> <date> <name> < note> - books a new ticket with these atributes. For empty note write \"\"\n" <<
-		"unbook <row> <seat> <date> < name>      - cancels the reservation\n" <<
-		"buy <row> < seat > <date> < name>       - purchases a new ticket with these atributes\n" <<
-		"bookings [<date>] [<name>]              - prints a list of all reserved tickets. Either date or the name are optional\n" <<
-		"check <code>                            - prints out the row and seat of a ticket, using the unique code each ticket has\n" <<
-		"report <from> <to> [<hall>]             - prints the information for all performances with a date, between your inputs\n" <<
-		"mostviewed                              - prints out a ranking of the most viewed performances\n" <<
-		"attendence <from> <to>               - prints out all events with less than 10% attendence and the option to delete them\n";
+void Manager::help() const {
+	std::cout << "The following commands are supported:\n"
+		<< "open <file>                     - opens <file>\n"
+		<< "close                           - closes currently opened file\n"
+		<< "save                            - saves the currently opened file\n"
+		<< "saveas <file>                   - saves the currently opened file in <file>\n"
+		<< "help                            - prints this information\n"
+		<< "exit                            - exits the program\n"
+		<< "addevent <date> <hall> <name>   - adds a new performance\n"
+		<< "freeseats <date> <name>         - prints available seats\n"
+		<< "book <row> <seat> <date> <name> <note> - books a ticket\n"
+		<< "unbook <row> <seat> <date> <name> - cancels the reservation\n"
+		<< "buy <row> <seat> <date> <name>  - purchases a ticket\n"
+		<< "bookings [<date>] [<name>]      - prints reserved tickets\n"
+		<< "check <code>                    - prints ticket info\n"
+		<< "report <from> <to> [<hall>]     - prints events in range\n"
+		<< "mostviewed                      - prints ranking of performances\n"
+		<< "attendence <from> <to>          - prints underperformers\n";
 }
 void Manager::file_exit() {
 	access = false;
@@ -519,8 +519,9 @@ void Manager::isValidDate(const std::string date) const {
 		case 12: return (day >= 1 && day <= 31);
 		case 2: if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
 			return (day >= 1 && day <= 29);
+		} else { 
+			return (day >= 1 && day <= 28); 
 		}
-			  else { return (day >= 1 && day <= 28); }
 		case 4:
 		case 6:
 		case 9:
