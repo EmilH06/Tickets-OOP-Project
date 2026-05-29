@@ -175,6 +175,7 @@ void Manager::file_open(std::string& filename) {
 			}
 		}
 	}
+	std::cin.ignore(1024, '\n');
 	file.clear();
 	std::cout << "Successfully opened file " << filename << std::endl;
 }
@@ -186,6 +187,7 @@ void Manager::file_close(const std::string& filename) {
 	info.clear();
 	access = false;
 	std::cout << "Successfully closed document " << filename << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::file_save(const std::string& filename) {
 	if (!access) {
@@ -203,6 +205,7 @@ void Manager::file_save(const std::string& filename) {
 	file.clear();
 	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved file " << filename << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::file_saveas(std::string& filename) {
 	if (!access) {
@@ -223,6 +226,7 @@ void Manager::file_saveas(std::string& filename) {
 	file.close();
 	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved another " << filename << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::help() const {
 	std::cout << "The following commands are supported:\n"
@@ -242,12 +246,14 @@ void Manager::help() const {
 		<< "report <from> <to> [<hall>]     - prints events in range\n"
 		<< "mostviewed                      - prints ranking of performances\n"
 		<< "attendence <from> <to>          - prints underperformers\n";
+	std::cin.ignore(1024, '\n');
 }
 void Manager::file_exit() {
 	access = false;
 	info.clear();
 	avaiable_halls.clear();
 	std::cout << "Exiting the program...";
+	std::cin.ignore(1024, '\n');
 }
 void Manager::addevent() {
 	if (!access) {
@@ -274,6 +280,7 @@ void Manager::addevent() {
 			};
 		this->info.push_back(Event(name, date, hallByIdx(hall_name)));
 		std::cout << "Successfully added event:" << name << std::endl;
+		std::cin.ignore(1024, '\n');
 }
 void Manager::freeseats() {
 	std::string name, date;
@@ -284,6 +291,7 @@ void Manager::freeseats() {
 	std::getline(std::cin,name);
 	isValidEventName(name);
 	functionApply(name, date, [&](Event& e)->void {e.getFreeseats(); });
+	std::cin.ignore(1024, '\n');
 }
 void Manager::book() {
 	BookingInfo info;
@@ -302,6 +310,7 @@ void Manager::book() {
 	bool foundMatch = false;
 	functionApply(info.name,info.date,[&](Event& e)->void{ e.addTicket("none", info.row, info.seat, "RESERVED", info.note); });
 	std::cout << "Successfully booked your seat!" << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::unbook() {
 	BookingInfo info;
@@ -311,6 +320,7 @@ void Manager::unbook() {
 	isValidEventName(info.name);
 	functionApply(info.name, info.date, [&](Event& e)->void {e.removeTicket(info.row, info.seat); });
 	std::cout << "Successfully unbooked your seat!" << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::buy() {
 	BookingInfo info;
@@ -320,6 +330,7 @@ void Manager::buy() {
 	isValidEventName(info.name);
 	functionApply(info.name, info.date, [&](Event& e)->void { e.purchaseTicket(info.name,info.date, info.row, info.seat, info.note); });
 	std::cout << "Successfully purchased your seat!" << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::bookings() {
 	if (!access) {
@@ -375,6 +386,7 @@ void Manager::bookings() {
 	if (!foundMatch) {
 		throw std::invalid_argument("There isn't an event registered to this name or date!");
 	}
+	std::cin.ignore(1024, '\n');
 }
 void Manager::check() {
 	if (!access) {
@@ -391,6 +403,7 @@ void Manager::check() {
 		}
 	}
 	throw std::logic_error("Invalid ticket code");
+	std::cin.ignore(1024, '\n');
 }
 void Manager::report() {
 	if (!access) {
@@ -419,6 +432,7 @@ void Manager::report() {
 				info[i].getReport(from, to);
 		}
 	}
+	std::cin.ignore(1024, '\n');
 }
 void Manager::mostviewed() {
 	if (!access) {
@@ -441,6 +455,7 @@ void Manager::mostviewed() {
 		copy.erase(copy.begin() + maxIdx);
 	}
 	std::cout << std::endl;
+	std::cin.ignore(1024, '\n');
 }
 void Manager::attendence() {
 	if (!access) {
@@ -476,8 +491,10 @@ void Manager::attendence() {
 	if (validator!=-1) {
 		info.erase(info.begin() + validator);
 		std::cout << "Successfully removed the event!";
+		std::cin.ignore(1024, '\n');
 		return;
 	}
+	std::cin.ignore(1024, '\n');
 	throw std::invalid_argument("The name and date provided dont't exist withing the underperformers list!");
 }
 void Manager::isValidEventName(const std::string name) const {

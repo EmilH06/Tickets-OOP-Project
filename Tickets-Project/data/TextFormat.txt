@@ -1,0 +1,7 @@
+<EVENT START>
+Name:
+Date:
+Hall:
+Tickets:
+uniqueCode row seat reserved/booked note
+<EVENT END>

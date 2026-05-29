@@ -11,12 +11,15 @@ void error_catcher(std::function<void()> func) {
 	}
 	catch (std::invalid_argument& e) {
 		std::cout << "Invalid input: " << e.what() << std::endl;
+		std::cin.ignore(1024, '\n');
 	}
 	catch (std::logic_error& e) {
 		std::cout << "Logic error: " << e.what() << std::endl;
+		std::cin.ignore(1024, '\n');
 	}
 	catch (std::runtime_error& e) {
 		std::cout << "System error: " << e.what() << std::endl;
+		std::cin.ignore(1024, '\n');
 	}
 }
 int main() {
@@ -26,7 +29,7 @@ int main() {
 	std::cout << "===========================================" << std::endl;
 	std::cout << "   TICKET ORGANIZER HAS BEEN OPENED        " << std::endl;
 	std::cout << "   Input commands to manage your events.\n   " << std::endl;
-	while (std::cout << "> " && std::cin >> command) {
+	while (std::cout << "> " && std::cin>>command) {
 	    if (command == "open") {
 		    error_catcher([&]() {mainTask->file_open(filename); });
 	    }
