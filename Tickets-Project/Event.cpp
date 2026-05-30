@@ -29,6 +29,9 @@ void Event::removeTicket(const int row, const int col) {
 	if (hall.getTicketStatus(row, col) == "AVAIABLE") {
 		throw std::logic_error("This seat is already avaiable!");
 	}
+	else if (hall.getTicketStatus(row, col) == "PURCHASED") {
+		throw std::logic_error("This seat has already been purchased!");
+	}
 	for (size_t i = 0; i < list.size(); i++) {
 		if (list[i].getRow() == row && list[i].getSeat() == col) {
 			list.erase(list.begin() + i);
@@ -48,9 +51,9 @@ bool Event::getAttendence(const std::string from, const std::string to) {
 	if (from <= date && date <= to) {
 		double percent = (this->list.size() / (hall.getRows() * hall.getCols())) * 100;
 		if (percent <= 10.00) {
-			return true;
 			std::cout << "Event: " << name << '\n';
 			std::cout << "Attendence: " << percent << '\n';
+			return true;
 		}
 	}
 	std::cout << std::endl;
@@ -73,8 +76,7 @@ void Event::getReport(const std::string from,const std::string to) {
 		std::cout << "Performance:" << '\n';
 		std::cout << "Name: " << name << '\n';
 		std::cout << "Date: " << date << '\n';
-		std::cout << "Tickets sold: " << list.size();
-		std::cout << std::endl;
+		std::cout << "Tickets sold: " << list.size() << std::endl;
 	}
 }
 void Event::purchaseTicket(const std::string name,const std::string date, const int row, const int seat, const std::string note) {

@@ -25,11 +25,11 @@ int main() {
 	std::string filename;
 	InputParser parser;
 	Manager mainTask;
-	std::cout << "   TICKET ORGANIZER HAS BEEN OPENED        " << std::endl;
-	std::cout << "   Input commands to manage your events.\n   " << std::endl;
+	std::cout << "TICKET ORGANIZER HAS BEEN OPENED        " << std::endl;
+	std::cout << "Input commands to manage your events.\n   " << std::endl;
 	while (std::cout << "> " && std::cin>>command) {
 	    if (command == "open") {
-		    error_catcher([&]() {mainTask.file_open(filename = parser.getFileName(filename)); });
+		    error_catcher([&]() {mainTask.file_open(filename = parser.getFileName(filename, mainTask.getAccess())); });
 	    }
 		else if (command == "close") {
 			error_catcher([&]() {mainTask.file_close(filename); });
@@ -39,7 +39,7 @@ int main() {
 		}
 		else if (command == "saveas") {
 			std::string newName;
-			error_catcher([&]() {mainTask.file_saveas(filename,parser.getFileName(newName)); });
+			error_catcher([&]() {mainTask.file_saveas(filename,parser.getFileName(newName,mainTask.getAccess())); });
 		}
 		else if (command == "help") {
 			mainTask.help();
@@ -49,34 +49,34 @@ int main() {
 			break;
 		}
 		else if (command == "addevent") {
-			error_catcher([&]() {mainTask.addevent(parser.getAddeventData()); });
+			error_catcher([&]() {mainTask.addevent(parser.getAddeventData(mainTask.getAccess())); });
 		}
 		else if (command == "freeseats") {
-			error_catcher([&]() {mainTask.freeseats(parser.getFreeseatsData()); });
+			error_catcher([&]() {mainTask.freeseats(parser.getFreeseatsData(mainTask.getAccess())); });
 		}
 		else if (command == "book") {
-			error_catcher([&]() {mainTask.book(parser.getBookData()); });
+			error_catcher([&]() {mainTask.book(parser.getBookData(mainTask.getAccess())); });
 		}
 		else if (command == "unbook") {
-			error_catcher([&]() {mainTask.unbook(parser.getUnbook_BoughtData()); });
+			error_catcher([&]() {mainTask.unbook(parser.getUnbook_BoughtData(mainTask.getAccess())); });
 		}
 		else if (command == "buy") {
-			error_catcher([&]() {mainTask.buy(parser.getUnbook_BoughtData()); });
+			error_catcher([&]() {mainTask.buy(parser.getUnbook_BoughtData(mainTask.getAccess())); });
 		}
 		else if (command == "bookings") {
-			error_catcher([&]() {mainTask.bookings(parser.getBookingsData()); });
+			error_catcher([&]() {mainTask.bookings(parser.getBookingsData(mainTask.getAccess())); });
 		}
 		else if (command == "check") {
-			error_catcher([&]() {mainTask.check(parser.getCheckData()); });
+			error_catcher([&]() {mainTask.check(parser.getCheckData(mainTask.getAccess())); });
 		}
 		else if (command == "report") {
-			error_catcher([&]() {mainTask.report(parser.getReportData()); });
+			error_catcher([&]() {mainTask.report(parser.getReportData(mainTask.getAccess())); });
 		}
 		else if (command == "mostviewed") {
 			error_catcher([&]() {mainTask.mostviewed(); });
 		}
 		else if (command == "attendence") {
-			error_catcher([&]() {mainTask.attendence(parser.getAttendenceData()); });
+			error_catcher([&]() {mainTask.attendence(parser.getAttendenceData(mainTask.getAccess())); });
 		}
 		else{
 			std::cin.clear();

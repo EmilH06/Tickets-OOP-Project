@@ -15,6 +15,7 @@ class Manager : public BasicCommand {
     std::vector<Hall> avaiable_halls;
 public:
 	Manager();
+	bool getAccess() const;
 	void functionApply(std::string name, std::string date, const std::function<void(Event&)>);
 	void file_open(std::string&) override;
 	void file_close(const std::string&) override;

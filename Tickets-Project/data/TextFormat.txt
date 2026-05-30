@@ -5,3 +5,66 @@ Hall:
 Tickets:
 uniqueCode row seat status note
 <EVENT END>
+
+Test Commands:
+Open:
+> open TestFile.txt
+> open TestFile2.txt
+
+Save As:
+> saveas temp.txt
+> saveas docs/temp2.txt
+
+Addevent:
+Fails:
+> addevent 2025-13-12 Hall 1 Lion King
+> addevent 2026-02-10 Hall 6 Pandora box
+> addevent 2027-02-29 Hall 2 Ttitle
+Valid:
+> addevent 2026-01-10 Hall 2 Lord of the rings
+> addevent 2027-12-30 Hall 4 The hobbits
+
+Freeseats:
+> freeseats 2026-01-10 Lord of the rings
+> freeseats 2030-10-01 Inception
+
+Book:
+Fails:
+> book -3 30 2026-01-10 Lord of the rings ""
+> book 5 6 2030-10-01 Inception "Clean before using"
+Valid:
+> book 11 11 2030-10-01 Inception ""
+> book 5 5 2027-05-19 The grinch ""
+
+Unbook:
+Fails:
+> unbook 9 10 2030-10-01 Inception
+Valid:
+> unbook 11 11 2030-10-01 Inception
+
+Buy: 
+Fails:
+> buy 11 11 2030-10-01 Inception
+Valid:
+> buy 5 5 2027-05-19 The grinch
+
+Bookings:
+Fails:
+> bookings 2031-11-10
+Valid:
+> bookings 2030-10-01
+> bookings Inception
+> bookings 2027-05-19 The grinch
+
+Check:
+> check 20270519Thegrinch55
+> check 20301001Inception910
+
+Report:
+> report 2027-05-19 2029-01-01
+> report 2025-05-19 2031-01-01 Hall 2
+
+Attend:
+> attendence 2027-05-19 2029-01-01
+> attendence 2024-11-23 2030-12-05
+  > 2026-02-10 Pandora box

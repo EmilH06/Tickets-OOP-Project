@@ -38,6 +38,7 @@ Hall::Hall(const Hall& other) {
 			}
 			std::cout << std::endl;
 		}
+		std::cout << std::endl;
 		if (!foundAvaiable) {
 			std::cout << "No seats are avaiable!" << std::endl;;
 		}

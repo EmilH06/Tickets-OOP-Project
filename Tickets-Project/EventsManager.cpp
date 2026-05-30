@@ -36,6 +36,9 @@ Manager::Manager(){
 	}
 	file.close();
 }
+bool Manager::getAccess() const {
+	return access;
+}
 void Manager::functionApply(std::string name, std::string date, const std::function<void(Event&)> func) {
 	bool foundMatch = false;
 	for (int i = 0; i < info.size(); i++) {
@@ -50,10 +53,6 @@ void Manager::functionApply(std::string name, std::string date, const std::funct
 	}
 }
 void Manager::file_open(std::string& filename) {
-	if (access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
 	file.clear();
 	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
 	if (!file.is_open()) {
@@ -64,8 +63,9 @@ void Manager::file_open(std::string& filename) {
 	std::string line;
 	std::string EventName, Date, HallName;
 	struct TicketReader {
-		int Ticket_row; int Ticket_seat;
+		int Ticket_row = 0; int Ticket_seat = 0;
 		std::string Ticket_status; std::string Ticket_note; std::string Ticket_code;
+		TicketReader() = default;
 	};
 	std::vector<TicketReader> ticketList;
 	auto hallByIdx = [&](std::string name) -> Hall& {
@@ -191,6 +191,7 @@ void Manager::file_saveas(std::string& filename,std::string newName) {
 	std::cin.ignore(1024, '\n');
 }
 void Manager::help() const {
+	std::cout << std::endl;
 	std::cout << "The following commands are supported:\n"
 		<< "open <file>                     - opens <file>\n"
 		<< "close                           - closes currently opened file\n"
@@ -235,7 +236,7 @@ void Manager::addevent(AddeventInfo input) {
 			std::cin.ignore(1024, '\n');
 			};
 		this->info.push_back(Event(input.name, input.date, hallByIdx(input.hall_name)));
-		std::cout << "Successfully added event:" << input.name << std::endl;
+		std::cout << "Successfully added event: " << input.name << std::endl;
 }
 void Manager::freeseats(BookingInfo input) {
 	isValidEventName(input.name);
@@ -258,9 +259,6 @@ void Manager::buy(BookingInfo input) {
 	std::cout << "Successfully purchased your seat!" << std::endl;
 }
 void Manager::bookings(BookingInfo input) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("You haven't open any file!");
 		bool foundMatch = false;
 		if (!input.name.empty() && !input.date.empty()) {
 			functionApply(input.name, input.date, [&](Event& e)->void { e.getBookedSeats(); });
@@ -271,7 +269,7 @@ void Manager::bookings(BookingInfo input) {
 			for (int i = 0; i < info.size(); i++) {
 				if (input.date == info[i].getDate()) {
 					foundMatch = true;
-					std::cout << "Perormance: " << info[i].getName() << '\n';
+					std::cout << "Perormance: " << info[i].getName() << std::endl;
 					info[i].getBookedSeats();
 				}
 			}
@@ -297,13 +295,8 @@ void Manager::bookings(BookingInfo input) {
 		if (!foundMatch) {
 			throw std::invalid_argument("There isn't an event registered to this name or date!");
 		}
-	}
 }
 void Manager::check(std::string code) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("You haven't open any file!");
-	}
 	for (Event e : info) {
 		if (e.checkCode(code)) {
 			return;
@@ -312,15 +305,11 @@ void Manager::check(std::string code) {
 	throw std::logic_error("Invalid ticket code");
 }
 void Manager::report(ReportInfo input) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("You haven't open any file!");
-	};
 	isValidDate(input.from);
 	isValidDate(input.to);
 	if (!input.hallname.empty()) {
 		isValidHall(input.hallname);
-		std::cout << "LIST OF EVENT FROM " << input.hallname << std::endl;;
+		std::cout << "LIST OF EVENTS FROM " << input.hallname << std::endl;;
 		for (int i = 0; i < info.size(); i++) {
 			if (input.hallname == info[i].getHallName()) {
 				info[i].getReport(input.from, input.to);
@@ -335,9 +324,6 @@ void Manager::report(ReportInfo input) {
 	}
 }
 void Manager::mostviewed() {
-	if (!access) {
-		throw std::logic_error("You haven't open any file!");
-	}
 	std::vector<Event> copy = this->info;
 	std::cout << "Most viewd event is:\n";
 	for (int i = 0; i < 3; i++) {
@@ -357,10 +343,6 @@ void Manager::mostviewed() {
 	std::cout << std::endl;
 }
 void Manager::attendence(ReportInfo input) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("You haven't open any file!");
-	}
 	isValidDate(input.from);
 	isValidDate(input.to);
 	std::vector<int> IdxList;
@@ -371,7 +353,8 @@ void Manager::attendence(ReportInfo input) {
 	}
 	std::cout << "You can take down any of the underperformers by typing: <date> <name>. If not type \"No\" or leave it empty!\n";
 	std::cout << "Your choice: ";
-	std::getline(std::cin >> std::ws, input.command);
+	std::cin.ignore(1024, '\n');
+	std::getline(std::cin, input.command);
 	if (input.command == "No" || input.command.empty()) {
 		return;
 	}
@@ -384,7 +367,7 @@ void Manager::attendence(ReportInfo input) {
 	int validator = existInList(name, date);
 	if (validator!=-1) {
 		info.erase(info.begin() + validator);
-		std::cout << "Successfully removed the event!";
+		std::cout << "Successfully removed the event!" << std::endl;
 		std::cin.ignore(1024, '\n');
 		return;
 	}

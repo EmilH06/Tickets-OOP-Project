@@ -1,27 +1,13 @@
 <EVENT START>
-Name:John
-Date:2026-06-01
+Name:Inception
+Date:2030-10-01
 Hall:Hall 2
 Tickets:
-none 1 5 RESERVED "Clean my seat"
+none 5 6 RESERVED "Clean before using"
+20301001Inception910 9 10 PURCHASED ""
 <EVENT END>
 <EVENT START>
-Name:Pinky
-Date:2026-10-12
-Hall:Hall 1
+Name:The grinch
+Date:2027-05-19
+Hall:Hall 4
 Tickets:
-none 1 5 RESERVED ""
-<EVENT END>
-<EVENT START>
-Name:"The Lion King"
-Date:2026-06-11
-Hall:Hall 3
-Tickets:
-<EVENT END>
-<EVENT START>
-Name:Lion King
-Date:2026-06-01
-Hall:Hall 3
-Tickets:
-20260601LionKing1-6 1 6 PURCHASED 
-<EVENT END>
