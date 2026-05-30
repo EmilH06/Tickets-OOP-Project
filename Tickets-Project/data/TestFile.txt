@@ -1,0 +1,27 @@
+<EVENT START>
+Name:John
+Date:2026-06-01
+Hall:Hall 2
+Tickets:
+none 1 5 RESERVED "Clean my seat"
+<EVENT END>
+<EVENT START>
+Name:Pinky
+Date:2026-10-12
+Hall:Hall 1
+Tickets:
+none 1 5 RESERVED ""
+<EVENT END>
+<EVENT START>
+Name:"The Lion King"
+Date:2026-06-11
+Hall:Hall 3
+Tickets:
+<EVENT END>
+<EVENT START>
+Name:Lion King
+Date:2026-06-01
+Hall:Hall 3
+Tickets:
+20260601LionKing1-6 1 6 PURCHASED 
+<EVENT END>

@@ -34,5 +34,5 @@ void Ticket::generateCode(std::string name,std::string date) {
 	for (int i = 0; i < name.size(); i++) {
 		if (name[i] == ' ') { name.erase(i, 1); i--; }
 	}
-	uniqueCode = date + name + std::to_string(row)+"-"+std::to_string(seat);
+	uniqueCode = date + name + std::to_string(row)+std::to_string(seat);
 }

@@ -232,34 +232,30 @@ void Manager::addevent(AddeventInfo input) {
 				}
 			}
 			throw std::runtime_error("There isn't a hall with that name avaiable!");
+			std::cin.ignore(1024, '\n');
 			};
 		this->info.push_back(Event(input.name, input.date, hallByIdx(input.hall_name)));
 		std::cout << "Successfully added event:" << input.name << std::endl;
-		std::cin.ignore(1024, '\n');
 }
 void Manager::freeseats(BookingInfo input) {
 	isValidEventName(input.name);
 	functionApply(input.name, input.date, [&](Event& e)->void {e.getFreeseats(); });
-	std::cin.ignore(1024, '\n');
 }
 void Manager::book(BookingInfo input) {
 	isValidEventName(input.name);
 	bool foundMatch = false;
 	functionApply(input.name, input.date,[&](Event& e)->void{ e.addTicket("none", input.row, input.seat, "RESERVED", input.note); });
 	std::cout << "Successfully booked your seat!" << std::endl;
-	std::cin.ignore(1024, '\n');
 }
 void Manager::unbook(BookingInfo input) {
 	isValidEventName(input.name);
 	functionApply(input.name, input.date, [&](Event& e)->void {e.removeTicket(input.row, input.seat); });
 	std::cout << "Successfully unbooked your seat!" << std::endl;
-	std::cin.ignore(1024, '\n');
 }
 void Manager::buy(BookingInfo input) {
 	isValidEventName(input.name);
 	functionApply(input.name, input.date, [&](Event& e)->void { e.purchaseTicket(input.name, input.date, input.row, input.seat, input.note); });
 	std::cout << "Successfully purchased your seat!" << std::endl;
-	std::cin.ignore(1024, '\n');
 }
 void Manager::bookings(BookingInfo input) {
 	if (!access) {
@@ -301,7 +297,6 @@ void Manager::bookings(BookingInfo input) {
 		if (!foundMatch) {
 			throw std::invalid_argument("There isn't an event registered to this name or date!");
 		}
-		std::cin.ignore(1024, '\n');
 	}
 }
 void Manager::check(std::string code) {
@@ -315,7 +310,6 @@ void Manager::check(std::string code) {
 		}
 	}
 	throw std::logic_error("Invalid ticket code");
-	std::cin.ignore(1024, '\n');
 }
 void Manager::report(ReportInfo input) {
 	if (!access) {
@@ -339,7 +333,6 @@ void Manager::report(ReportInfo input) {
 				info[i].getReport(input.from, input.to);
 		}
 	}
-	std::cin.ignore(1024, '\n');
 }
 void Manager::mostviewed() {
 	if (!access) {
@@ -362,7 +355,6 @@ void Manager::mostviewed() {
 		copy.erase(copy.begin() + maxIdx);
 	}
 	std::cout << std::endl;
-	std::cin.ignore(1024, '\n');
 }
 void Manager::attendence(ReportInfo input) {
 	if (!access) {
@@ -396,7 +388,6 @@ void Manager::attendence(ReportInfo input) {
 		std::cin.ignore(1024, '\n');
 		return;
 	}
-	std::cin.ignore(1024, '\n');
 	throw std::invalid_argument("The name and date provided dont't exist withing the underperformers list!");
 }
 void Manager::isValidEventName(const std::string name) const {
