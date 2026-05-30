@@ -2,6 +2,7 @@
 #include "InputParameters.h"
 class InputParser {
 public:
+	std::string getFileName(std::string&);
 	AddeventInfo getAddeventData();
 	BookingInfo getFreeseatsData();
 	BookingInfo getBookData();

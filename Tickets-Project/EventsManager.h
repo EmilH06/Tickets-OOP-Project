@@ -19,7 +19,7 @@ public:
 	void file_open(std::string&) override;
 	void file_close(const std::string&) override;
 	void file_save(const std::string&) override;
-	void file_saveas(std::string&) override;
+	void file_saveas(std::string&,std::string) override;
 	void help() const override;
 	void file_exit() override;
 	void addevent(AddeventInfo) ;

@@ -32,7 +32,7 @@ int main() {
 	std::cout << "   Input commands to manage your events.\n   " << std::endl;
 	while (std::cout << "> " && std::cin>>command) {
 	    if (command == "open") {
-		    error_catcher([&]() {mainTask.file_open(filename); });
+		    error_catcher([&]() {mainTask.file_open(filename = parser.getFileName(filename)); });
 	    }
 		else if (command == "close") {
 			error_catcher([&]() {mainTask.file_close(filename); });
@@ -41,7 +41,8 @@ int main() {
 			error_catcher([&]() {mainTask.file_save(filename); });
 		}
 		else if (command == "saveas") {
-			error_catcher([&]() {mainTask.file_saveas(filename); });
+			std::string newName;
+			error_catcher([&]() {mainTask.file_saveas(filename,parser.getFileName(newName)); });
 		}
 		else if (command == "help") {
 			mainTask.help();

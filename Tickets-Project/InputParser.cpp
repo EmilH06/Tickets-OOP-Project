@@ -2,6 +2,27 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+void validate_FileName(std::string& filename) {
+	size_t size = filename.length();
+	if (size < 5) {
+		throw std::invalid_argument("File is too short!");
+	}
+	if (filename[size - 1] != 't' || filename[size - 2] != 'x' || filename[size - 3] != 't' || filename[size - 4] != '.') {
+		throw std::invalid_argument("Invalid format! File supports only .txt format type!");
+	}
+	for (char c : filename) {
+		if (c == '*' || c == '?' || c == '<' || c == '>' || c == '|') {
+			throw std::invalid_argument("Filename contains forbidden characters!");
+		}
+	}
+	size_t nameIdx = filename.find("data/");
+	if (nameIdx != std::string::npos) { filename.erase(0, 5); }
+}
+std::string InputParser::getFileName(std::string& filename) {
+	std::cin >> filename;
+	validate_FileName(filename);
+	return filename;
+}
 AddeventInfo InputParser::getAddeventData() {
 	AddeventInfo input;
 	if (!(std::cin >> input.date >> input.hall_word >> input.hallNum)) {

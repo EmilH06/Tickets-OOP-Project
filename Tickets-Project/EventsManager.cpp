@@ -6,22 +6,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-void validate_FileName(std::string& filename) {
-	size_t size= filename.length();
-	if (size < 5) {
-		throw std::invalid_argument("File is too short!");
-	}
-	if (filename[size - 1] != 't' || filename[size - 2] != 'x' || filename[size - 3] != 't' || filename[size - 4] != '.') {
-		throw std::invalid_argument("Invalid format! File supports only .txt format type!");
-	}
-	for (char c : filename) {
-		if (c == '*' || c == '?' || c == '<' || c == '>' || c == '|') {
-			throw std::invalid_argument("Filename contains forbidden characters!");
-		}
-	}
-	size_t nameIdx = filename.find("data/");
-	if (nameIdx != std::string::npos) { filename.erase(0, 5); }
-}
 std::ostream& operator<<(std::ostream& out, Event& information) {
 	std::vector<Ticket> copy = information.getList();
 	out << "<EVENT START>" << '\n';
@@ -70,8 +54,6 @@ void Manager::file_open(std::string& filename) {
 		std::cin.ignore(1024, '\n');
 		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
 	}
-	std::cin >> filename;
-	validate_FileName(filename);
 	file.clear();
 	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
 	if (!file.is_open()) {
@@ -190,13 +172,10 @@ void Manager::file_save(const std::string& filename) {
 	std::cout << "Successfully saved file " << filename << std::endl;
 	std::cin.ignore(1024, '\n');
 }
-void Manager::file_saveas(std::string& filename) {
+void Manager::file_saveas(std::string& filename,std::string newName) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
-	std::string newName;
-	std::cin >> newName;
-	validate_FileName(newName);
 	std::ofstream newFile(newName, std::ios::out | std::ios::trunc);
 	if (!newFile.is_open()) {
 		throw std::runtime_error("Incorrect location input or you're trying to access prohibited area!");

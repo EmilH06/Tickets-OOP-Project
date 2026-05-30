@@ -10,7 +10,7 @@ public:
 	virtual void file_open(std::string&) = 0;
 	virtual void file_close(const std::string&) = 0;
 	virtual void file_save(const std::string&) = 0;
-	virtual void file_saveas(std::string&) = 0;
+	virtual void file_saveas(std::string&,std::string) = 0;
 	virtual void help() const = 0;
 	virtual void file_exit() = 0;
 	virtual ~BasicCommand() = default;
