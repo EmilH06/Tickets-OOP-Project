@@ -1,5 +1,6 @@
 #include "BasicCommands.h"
 #include "EventsManager.h"
+#include "InputParser.h"
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -25,59 +26,59 @@ void error_catcher(std::function<void()> func) {
 int main() {
 	std::string command;
 	std::string filename;
-	Manager* mainTask = new Manager();
-	std::cout << "===========================================" << std::endl;
+	InputParser parser;
+	Manager mainTask;
 	std::cout << "   TICKET ORGANIZER HAS BEEN OPENED        " << std::endl;
 	std::cout << "   Input commands to manage your events.\n   " << std::endl;
 	while (std::cout << "> " && std::cin>>command) {
 	    if (command == "open") {
-		    error_catcher([&]() {mainTask->file_open(filename); });
+		    error_catcher([&]() {mainTask.file_open(filename); });
 	    }
 		else if (command == "close") {
-			error_catcher([&]() {mainTask->file_close(filename); });
+			error_catcher([&]() {mainTask.file_close(filename); });
 		}
 		else if (command == "save") {
-			error_catcher([&]() {mainTask->file_save(filename); });
+			error_catcher([&]() {mainTask.file_save(filename); });
 		}
 		else if (command == "saveas") {
-			error_catcher([&]() {mainTask->file_saveas(filename); });
+			error_catcher([&]() {mainTask.file_saveas(filename); });
 		}
 		else if (command == "help") {
-			mainTask->help();
+			mainTask.help();
 		}
 		else if (command == "exit") {
-			mainTask->file_exit();
+			mainTask.file_exit();
 			break;
 		}
 		else if (command == "addevent") {
-			error_catcher([&]() {mainTask->addevent(); });
+			error_catcher([&]() {mainTask.addevent(parser.getAddeventData()); });
 		}
 		else if (command == "freeseats") {
-			error_catcher([&]() {mainTask->freeseats(); });
+			error_catcher([&]() {mainTask.freeseats(parser.getFreeseatsData()); });
 		}
 		else if (command == "book") {
-			error_catcher([&]() {mainTask->book(); });
+			error_catcher([&]() {mainTask.book(parser.getBookData()); });
 		}
 		else if (command == "unbook") {
-			error_catcher([&]() {mainTask->unbook(); });
+			error_catcher([&]() {mainTask.unbook(parser.getUnbook_BoughtData()); });
 		}
 		else if (command == "buy") {
-			error_catcher([&]() {mainTask->buy(); });
+			error_catcher([&]() {mainTask.buy(parser.getUnbook_BoughtData()); });
 		}
 		else if (command == "bookings") {
-			error_catcher([&]() {mainTask->bookings(); });
+			error_catcher([&]() {mainTask.bookings(parser.getBookingsData()); });
 		}
 		else if (command == "check") {
-			error_catcher([&]() {mainTask->check(); });
+			error_catcher([&]() {mainTask.check(parser.getCheckData()); });
 		}
 		else if (command == "report") {
-			error_catcher([&]() {mainTask->report(); });
+			error_catcher([&]() {mainTask.report(parser.getReportData()); });
 		}
 		else if (command == "mostviewed") {
-			error_catcher([&]() {mainTask->mostviewed(); });
+			error_catcher([&]() {mainTask.mostviewed(); });
 		}
 		else if (command == "attendence") {
-			error_catcher([&]() {mainTask->attendence(); });
+			error_catcher([&]() {mainTask.attendence(parser.getAttendenceData()); });
 		}
 		else{
 			std::cin.clear();
@@ -85,5 +86,4 @@ int main() {
 			std::cout << "Invalid command! Please use the allowed commands!" << std::endl;
 		}
 	}
-	delete mainTask;
 }

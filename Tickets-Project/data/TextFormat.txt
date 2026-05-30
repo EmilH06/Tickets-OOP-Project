@@ -3,5 +3,5 @@ Name:
 Date:
 Hall:
 Tickets:
-uniqueCode row seat reserved/booked note
+uniqueCode row seat status note
 <EVENT END>

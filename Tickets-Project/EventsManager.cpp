@@ -1,3 +1,4 @@
+#include "InputParameters.h"
 #include "EventsManager.h"
 #include "Ticket.h"
 #include <vector>
@@ -5,24 +6,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
-struct BookingInfo {
-	int row;
-	int seat;
-	std::string date;
-	std::string name;
-	std::string note = "";
-};
-void data_input(bool& access, BookingInfo& info) {
-	if (!access) {
-		throw std::logic_error("You haven't open any file!");
-	}
-	if (!(std::cin >> info.row >> info.seat >> info.date)) {
-		throw std::invalid_argument("Invalid input format! Correct: book <row> <seat> <date> <name> <\"note\">");
-	}
-	if (info.row < 0 || info.seat < 0) {
-		throw std::logic_error("The row and the seat can't be negative numbers");
-	}
-}
 void validate_FileName(std::string& filename) {
 	size_t size= filename.length();
 	if (size < 5) {
@@ -224,7 +207,7 @@ void Manager::file_saveas(std::string& filename) {
 	filename = newName;
 	newFile.close();
 	file.close();
-	file.open("data/"+filename, std::ios::in | std::ios::out | std::ios::app);
+	file.open(filename, std::ios::in | std::ios::out | std::ios::app);
 	std::cout << "Successfully saved another " << filename << std::endl;
 	std::cin.ignore(1024, '\n');
 }
@@ -243,9 +226,9 @@ void Manager::help() const {
 		<< "buy <row> <seat> <date> <name>  - purchases a ticket\n"
 		<< "bookings [<date>] [<name>]      - prints reserved tickets\n"
 		<< "check <code>                    - prints ticket info\n"
-		<< "report <from> <to> [<hall>]     - prints events in range\n"
+		<< "report <from> <to> [<hall>]     - prints events in range of dates\n"
 		<< "mostviewed                      - prints ranking of performances\n"
-		<< "attendence <from> <to>          - prints underperformers\n";
+		<< "attendence <from> <to>          - prints underperformers with less than 10% in range of dates\n";
 	std::cin.ignore(1024, '\n');
 }
 void Manager::file_exit() {
@@ -255,21 +238,14 @@ void Manager::file_exit() {
 	std::cout << "Exiting the program...";
 	std::cin.ignore(1024, '\n');
 }
-void Manager::addevent() {
+void Manager::addevent(AddeventInfo input) {
 	if (!access) {
 		throw std::logic_error("You haven't open any file!");
 	}
-	std::string name, date, hall_word, hallNum;
-		if (!(std::cin >> date >> hall_word >> hallNum)) {
-			throw std::invalid_argument("Invalid input format! Correct: addevent <YYYY-MM-DD> <hall_name> <event_name>");
-		}
-		std::string hall_name = hall_word + ' ' + hallNum;
-		std::cin >> std::ws;
-		std::getline(std::cin, name);
-		isValidHall(hall_name);
-		isValidDate(date);
-		isAvaiableDate(date, hall_name);
-		isValidEventName(name);
+		isValidHall(input.hall_name);
+		isValidDate(input.date);
+		isAvaiableDate(input.date, input.hall_name);
+		isValidEventName(input.name);
 		auto hallByIdx = [&](std::string name) -> Hall& {
 			for (size_t i = 0; i < avaiable_halls.size(); i++) {
 				if (avaiable_halls[i].getName() == name) {
@@ -278,124 +254,81 @@ void Manager::addevent() {
 			}
 			throw std::runtime_error("There isn't a hall with that name avaiable!");
 			};
-		this->info.push_back(Event(name, date, hallByIdx(hall_name)));
-		std::cout << "Successfully added event:" << name << std::endl;
+		this->info.push_back(Event(input.name, input.date, hallByIdx(input.hall_name)));
+		std::cout << "Successfully added event:" << input.name << std::endl;
 		std::cin.ignore(1024, '\n');
 }
-void Manager::freeseats() {
-	std::string name, date;
-	if (!(std::cin >> date)) {
-		throw std::invalid_argument("Invalid input format! Correct: freeseats <YYYY-MM-DD> <name>");
-	}
-	std::cin >> std::ws;
-	std::getline(std::cin,name);
-	isValidEventName(name);
-	functionApply(name, date, [&](Event& e)->void {e.getFreeseats(); });
+void Manager::freeseats(BookingInfo input) {
+	isValidEventName(input.name);
+	functionApply(input.name, input.date, [&](Event& e)->void {e.getFreeseats(); });
 	std::cin.ignore(1024, '\n');
 }
-void Manager::book() {
-	BookingInfo info;
-	std::string line;
-	data_input(this->access, info);
-	std::cin >> std::ws;
-	std::getline(std::cin, line);
-	size_t firstApp = line.find('"');
-	size_t secondApp = line.find('"', firstApp + 1);
-	if (firstApp == std::string::npos || secondApp == std::string::npos) {
-		throw std::invalid_argument("The note should be enclosed in quotes, if your note is empty write <\"\"> ");
-	}
-	info.name = line.substr(0, firstApp-1);
-	info.note = line.substr(firstApp, secondApp);
-	isValidEventName(info.name);
+void Manager::book(BookingInfo input) {
+	isValidEventName(input.name);
 	bool foundMatch = false;
-	functionApply(info.name,info.date,[&](Event& e)->void{ e.addTicket("none", info.row, info.seat, "RESERVED", info.note); });
+	functionApply(input.name, input.date,[&](Event& e)->void{ e.addTicket("none", input.row, input.seat, "RESERVED", input.note); });
 	std::cout << "Successfully booked your seat!" << std::endl;
 	std::cin.ignore(1024, '\n');
 }
-void Manager::unbook() {
-	BookingInfo info;
-	data_input(this->access,info);
-	std::cin >> std::ws;
-	std::getline(std::cin, info.name);
-	isValidEventName(info.name);
-	functionApply(info.name, info.date, [&](Event& e)->void {e.removeTicket(info.row, info.seat); });
+void Manager::unbook(BookingInfo input) {
+	isValidEventName(input.name);
+	functionApply(input.name, input.date, [&](Event& e)->void {e.removeTicket(input.row, input.seat); });
 	std::cout << "Successfully unbooked your seat!" << std::endl;
 	std::cin.ignore(1024, '\n');
 }
-void Manager::buy() {
-	BookingInfo info;
-	data_input(this->access, info);
-	std::cin >> std::ws;
-	std::getline(std::cin, info.name);
-	isValidEventName(info.name);
-	functionApply(info.name, info.date, [&](Event& e)->void { e.purchaseTicket(info.name,info.date, info.row, info.seat, info.note); });
+void Manager::buy(BookingInfo input) {
+	isValidEventName(input.name);
+	functionApply(input.name, input.date, [&](Event& e)->void { e.purchaseTicket(input.name, input.date, input.row, input.seat, input.note); });
 	std::cout << "Successfully purchased your seat!" << std::endl;
 	std::cin.ignore(1024, '\n');
 }
-void Manager::bookings() {
+void Manager::bookings(BookingInfo input) {
 	if (!access) {
 		std::cin.ignore(1024, '\n');
 		throw std::logic_error("You haven't open any file!");
-	}
-	std::string line;
-	std::string name, date;
-	std::cin >> std::ws;
-	std::getline(std::cin, line);
-	size_t spacePos = line.find(' ');
-	if (spacePos != std::string::npos) {
-		date = line.substr(0, spacePos);
-		name = line.substr(spacePos + 1);
-	}
-	else if (!line.empty()) {
-		if (line.find('-') != std::string::npos && line.length()==10) { date = line; }
-		else { name = line; }
-	}
-	bool foundMatch = false;
-	if (!name.empty() && !date.empty()) {
-		functionApply(name, date, [&](Event& e)->void { e.getBookedSeats(); });
-		return;
-	}
-	else if (name.empty() && !date.empty()) {
-		std::cout << "Events on date " << date << ":\n";
-		for (int i = 0; i < info.size(); i++) {
-			if (date == info[i].getDate()) {
-				foundMatch = true;
-				std::cout << "Perormance: " << info[i].getName() << '\n';
-				info[i].getBookedSeats();
+		bool foundMatch = false;
+		if (!input.name.empty() && !input.date.empty()) {
+			functionApply(input.name, input.date, [&](Event& e)->void { e.getBookedSeats(); });
+			return;
+		}
+		else if (input.name.empty() && !input.date.empty()) {
+			std::cout << "Events on date " << input.date << ":\n";
+			for (int i = 0; i < info.size(); i++) {
+				if (input.date == info[i].getDate()) {
+					foundMatch = true;
+					std::cout << "Perormance: " << info[i].getName() << '\n';
+					info[i].getBookedSeats();
+				}
 			}
 		}
-	}
-	else if(!name.empty() && date.empty() ){
-		std::cout << "Events with name " << name << ":\n";
-		for (int i = 0; i < info.size(); i++) {
-			if (name == info[i].getName()) {
-				foundMatch = true;
-				std::cout << "Perormance: " << info[i].getName() <<" ("<<date<<")\n";
-				info[i].getBookedSeats();
+		else if (!input.name.empty() && input.date.empty()) {
+			std::cout << "Events with name " << input.name << ":\n";
+			for (int i = 0; i < info.size(); i++) {
+				if (input.name == info[i].getName()) {
+					foundMatch = true;
+					std::cout << "Perormance: " << info[i].getName() << " (" << input.date << ")\n";
+					info[i].getBookedSeats();
+				}
 			}
 		}
-	}
-	else if (name.empty() && date.empty()) {
-		std::cout << "Events\n";
-		for (int i = 0; i < info.size(); i++) {
+		else if (input.name.empty() && input.date.empty()) {
+			std::cout << "Events\n";
+			for (int i = 0; i < info.size(); i++) {
 				foundMatch = true;
 				std::cout << "Perormance: " << info[i].getName() << " (" << info[i].getDate() << ")\n";
 				info[i].getBookedSeats();
+			}
 		}
+		if (!foundMatch) {
+			throw std::invalid_argument("There isn't an event registered to this name or date!");
+		}
+		std::cin.ignore(1024, '\n');
 	}
-	if (!foundMatch) {
-		throw std::invalid_argument("There isn't an event registered to this name or date!");
-	}
-	std::cin.ignore(1024, '\n');
 }
-void Manager::check() {
+void Manager::check(std::string code) {
 	if (!access) {
 		std::cin.ignore(1024, '\n');
 		throw std::logic_error("You haven't open any file!");
-	}
-	std::string code;
-	if (!(std::cin >> code)) {
-		throw std::invalid_argument("Invalid input format! Correct: check <code>");
 	}
 	for (Event e : info) {
 		if (e.checkCode(code)) {
@@ -405,31 +338,26 @@ void Manager::check() {
 	throw std::logic_error("Invalid ticket code");
 	std::cin.ignore(1024, '\n');
 }
-void Manager::report() {
+void Manager::report(ReportInfo input) {
 	if (!access) {
 		std::cin.ignore(1024, '\n');
 		throw std::logic_error("You haven't open any file!");
-	}
-	std::string from, to, hallname;
-	if (!(std::cin >> from>>to)) {
-		throw std::invalid_argument("Invalid input format! Correct: report <from> <to> [<hall>]");
-	}
-	std::getline(std::cin, hallname);
-	isValidDate(from);
-	isValidDate(to);
-	if (!hallname.empty()) {
-		isValidHall(hallname);
-		std::cout << "LIST OF EVENT FROM " << hallname << std::endl;;
+	};
+	isValidDate(input.from);
+	isValidDate(input.to);
+	if (!input.hallname.empty()) {
+		isValidHall(input.hallname);
+		std::cout << "LIST OF EVENT FROM " << input.hallname << std::endl;;
 		for (int i = 0; i < info.size(); i++) {
-			if (hallname == info[i].getHallName()) {
-				info[i].getReport(from,to);
+			if (input.hallname == info[i].getHallName()) {
+				info[i].getReport(input.from, input.to);
 			}
 		}
 	}
 	else {
 		std::cout << "LIST OF ALL EVENTS" << std::endl;
 		for (int i = 0; i < info.size(); i++) {
-				info[i].getReport(from, to);
+				info[i].getReport(input.from, input.to);
 		}
 	}
 	std::cin.ignore(1024, '\n');
@@ -457,36 +385,31 @@ void Manager::mostviewed() {
 	std::cout << std::endl;
 	std::cin.ignore(1024, '\n');
 }
-void Manager::attendence() {
+void Manager::attendence(ReportInfo input) {
 	if (!access) {
 		std::cin.ignore(1024, '\n');
 		throw std::logic_error("You haven't open any file!");
 	}
-	std::string from, to;
-	if (!(std::cin >> from >> to)) {
-		throw std::invalid_argument("Invalid input format! Correct: report <from> <to> [<hall>]");
-	}
-	isValidDate(from);
-	isValidDate(to);
+	isValidDate(input.from);
+	isValidDate(input.to);
 	std::vector<int> IdxList;
 	for (size_t i = 0; i < info.size(); i++) {
-		if (info[i].getAttendence(from, to)) {
+		if (info[i].getAttendence(input.from, input.to)) {
 			IdxList.push_back(i);
 		}
 	}
 	std::cout << "You can take down any of the underperformers by typing: <date> <name>. If not type \"No\" or leave it empty!\n";
 	std::cout << "Your choice: ";
-	std::string command;
-	std::getline(std::cin >> std::ws, command);
-	if (command == "No" || command.empty()) {
+	std::getline(std::cin >> std::ws, input.command);
+	if (input.command == "No" || input.command.empty()) {
 		return;
 	}
 	auto existInList = [&](std::string& name, std::string& date)->int {for (int index : IdxList) {
 		if (info[index].getName() == name && info[index].getDate() == date) return index;} return -1; };
-	size_t pos = command.find(' ');
+	size_t pos = input.command.find(' ');
 	if (pos == std::string::npos) { throw std::invalid_argument("Invalid command!"); }
-	std::string date = command.substr(0, pos);
-	std::string name = command.substr(pos + 1);
+	std::string date = input.command.substr(0, pos);
+	std::string name = input.command.substr(pos + 1);
 	int validator = existInList(name, date);
 	if (validator!=-1) {
 		info.erase(info.begin() + validator);

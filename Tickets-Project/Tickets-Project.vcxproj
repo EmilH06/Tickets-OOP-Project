@@ -130,11 +130,14 @@
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="EventsManager.cpp" />
     <ClCompile Include="Halls.cpp" />
+    <ClCompile Include="InputParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="BasicCommands.h" />
     <ClCompile Include="Ticket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InputParameters.h" />
+    <ClInclude Include="InputParser.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="EventsManager.h" />
     <ClInclude Include="Halls.h" />

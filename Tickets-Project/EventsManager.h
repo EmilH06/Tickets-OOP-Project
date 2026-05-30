@@ -1,4 +1,5 @@
 #pragma once
+#include "InputParameters.h"
 #include "BasicCommands.h"
 #include "Ticket.h"
 #include "Halls.h"
@@ -21,16 +22,16 @@ public:
 	void file_saveas(std::string&) override;
 	void help() const override;
 	void file_exit() override;
-	void addevent() ;
-	void freeseats();
-	void book();
-	void unbook();
-	void buy();
-	void bookings();
-	void check();
-	void report();
+	void addevent(AddeventInfo) ;
+	void freeseats(BookingInfo);
+	void book(BookingInfo);
+	void unbook(BookingInfo);
+	void buy(BookingInfo);
+	void bookings(BookingInfo);
+	void check(std::string);
+	void report(ReportInfo);
 	void mostviewed();
-	void attendence();
+	void attendence(ReportInfo);
 	void isValidDate (const std::string) const;
 	void isAvaiableDate(const std::string, const std::string) const;
 	void isValidHall(const std::string) const;
