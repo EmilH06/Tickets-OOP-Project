@@ -26,4 +26,5 @@ public:
 	void printBookedSeats() const;
 	std::string getTicketStatus(const int&, const int&);
 	Hall& operator=(const Hall& other);
+	~Hall() = default;
 };

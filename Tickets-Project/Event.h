@@ -24,4 +24,5 @@ public:
 	void getReport(const std::string, const std::string);
 	void purchaseTicket(const std::string, const std::string, const int, const int, const std::string);
 	Event& operator=(const Event&);
+	~Event() = default;
 };
