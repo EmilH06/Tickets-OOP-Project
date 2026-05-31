@@ -51,7 +51,7 @@ bool Event::getAttendence(const std::string from, const std::string to) {
 	if (from <= date && date <= to) {
 		double percent = (this->list.size() / (hall.getRows() * hall.getCols())) * 100;
 		if (percent <= 10.00) {
-			std::cout << "Event: " << name << '\n';
+			std::cout << "Event: " << name <<"("<<date<<")"<< '\n';
 			std::cout << "Attendence: " << percent << '\n';
 			return true;
 		}
@@ -65,7 +65,7 @@ bool Event::checkCode(const std::string& code) {
 	}
 	for (Ticket& t : list) {
 		if (t.getCode() == code) {
-			std::cout << "Row: " << t.getRow() << ' ' << "Seat: " << t.getSeat() << std::endl;
+			std::cout << "Row: " << t.getRow() << ' ' << "Seat: " << t.getSeat() << '\n';
 			return true;
 		}
 	}
@@ -73,10 +73,11 @@ bool Event::checkCode(const std::string& code) {
 }
 void Event::getReport(const std::string from,const std::string to) {
 	if (from <= date && date <= to) {
-		std::cout << "Performance:" << '\n';
+		std::cout << "<PERFORMANCE>" << '\n';
 		std::cout << "Name: " << name << '\n';
 		std::cout << "Date: " << date << '\n';
-		std::cout << "Tickets sold: " << list.size() << std::endl;
+		std::cout << "Hall: " << hall.getName() << '\n';
+		std::cout << "Tickets sold: " << list.size() << '\n';
 	}
 }
 void Event::purchaseTicket(const std::string name,const std::string date, const int row, const int seat, const std::string note) {

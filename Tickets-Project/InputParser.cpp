@@ -2,6 +2,13 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <sstream>
+template <typename T>
+void extractOrthrow(std::stringstream& ss, T& value, const std::string& error) {
+	if (!(ss >> value)) {
+		throw std::invalid_argument(error);
+	}
+}
 void validate_FileName(std::string& filename) {
 	size_t size = filename.length();
 	if (size < 5) {
@@ -18,6 +25,12 @@ void validate_FileName(std::string& filename) {
 	size_t nameIdx = filename.find("data/");
 	if (nameIdx != std::string::npos) { filename.erase(0, 5); }
 }
+void InputParser::validateAcess(bool access) {
+	if (!access) {
+		std::cin.ignore(1024, '\n');
+		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
+	}
+}
 std::string InputParser::getFileName(std::string& filename,bool access) {
 	if (access) {
 		std::cin.ignore(1024, '\n');
@@ -28,46 +41,44 @@ std::string InputParser::getFileName(std::string& filename,bool access) {
 	return filename;
 }
 AddeventInfo InputParser::getAddeventData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
-	AddeventInfo input;
-	if (!(std::cin >> input.date >> input.hall_word >> input.hallNum)) {
+	validateAcess(access);
+	std::string line;
+	if (!(std::getline(std::cin,line))) {
 		throw std::invalid_argument("Invalid input format! Correct: addevent <YYYY-MM-DD> <hall_name> <event_name>");
 	}
+	std::stringstream ss(line);
+	AddeventInfo input;
+	extractOrthrow(ss, input.date, "Invalide date!");
+	extractOrthrow(ss, input.hall_word, "Invalide hall!");
+	extractOrthrow(ss, input.hallNum, "Invalide hall!");
+	std::getline(ss >> std::ws, input.name);
 	input.hall_name = input.hall_word + ' ' + input.hallNum;
-	std::cin >> std::ws;
-	std::getline(std::cin, input.name);
 	return input;
 }
 BookingInfo InputParser::getFreeseatsData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	BookingInfo input;
-	if (!(std::cin >> input. date)) {
-		throw std::invalid_argument("Invalid input format! Correct: freeseats <YYYY-MM-DD> <name>");
+	std::string line;
+	if (!(std::getline(std::cin, line))) {
+		throw std::invalid_argument("Invalid input format! Correct: freeseats <date> <name>");
 	}
-	std::cin >> std::ws;
-	std::getline(std::cin, input.name);
+	std::stringstream ss(line);
+	extractOrthrow(ss, input.date, "Invalide date!");
+	extractOrthrow(ss, input.name, "Invalide name!");
 	return input;
 }
 BookingInfo InputParser::getBookData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	BookingInfo input;
-	if (!(std::cin >> input.row >> input.seat >> input.date)) {
-		throw std::invalid_argument("Invalid input format! Correct: book <row> <seat> <date> <name> <\"note\">");
+	std::string line;
+	if (!(std::getline(std::cin, line))) {
+		throw std::invalid_argument("Invalid input format! Correct: freeseats <row> <seat> <date> <name> <note>");
 	}
-	if (input.row < 0 || input.seat < 0) {
-		throw std::logic_error("The row and the seat can't be negative numbers");
-	}
-	std::cin >> std::ws;
-	std::getline(std::cin, input.line);
+	std::stringstream ss(line);
+	extractOrthrow(ss, input.row, "Invalide row!");
+	extractOrthrow(ss, input.seat, "Invalide seat!");
+	extractOrthrow(ss, input.date, "Invalide date!");
+	std::getline(ss >> std::ws, input.line);
 	size_t firstApp = input.line.find('"');
 	size_t secondApp = input.line.find('"', firstApp + 1);
 	if (firstApp == std::string::npos || secondApp == std::string::npos) {
@@ -78,26 +89,21 @@ BookingInfo InputParser::getBookData(bool access) {
 	return input;
 }
 BookingInfo InputParser::getUnbook_BoughtData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	BookingInfo input;
-	if (!(std::cin >> input.row >> input.seat >> input.date)) {
-		throw std::invalid_argument("Invalid input format! Correct: book <row> <seat> <date> <name> <\"note\">");
+	std::string line;
+	if (!(std::getline(std::cin, line))) {
+		throw std::invalid_argument("Invalid input format! Correct: freeseats <date> <name>");
 	}
-	if (input.row < 0 || input.seat < 0) {
-		throw std::logic_error("The row and the seat can't be negative numbers");
-	}
-	std::cin >> std::ws;
-	std::getline(std::cin, input.name);
+	std::stringstream ss(line);
+	extractOrthrow(ss, input.row, "Invalide row!");
+	extractOrthrow(ss, input.seat, "Invalide seat!");
+	extractOrthrow(ss, input.date, "Invalide date!");
+	std::getline(ss >> std::ws, input.name);
 	return input;
 }
 BookingInfo InputParser::getBookingsData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	BookingInfo input;
 	std::cin >> std::ws;
 	std::getline(std::cin, input.line);
@@ -113,10 +119,7 @@ BookingInfo InputParser::getBookingsData(bool access) {
 	return input;
 }
 std::string InputParser::getCheckData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	std::string code;
 	if (!(std::cin >> code)) {
 		throw std::invalid_argument("Invalid input format! Correct: check <code>");
@@ -129,23 +132,25 @@ ReportInfo InputParser::getReportData(bool access) {
 		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
 	}
 	ReportInfo input;
-	if (!(std::cin >> input.from >> input.to)) {
+	std::string line;
+	if (!(std::getline(std::cin, line))) {
 		throw std::invalid_argument("Invalid input format! Correct: report <from> <to> [<hall>]");
 	}
-	std::getline(std::cin, input.hallname);
-	if (!(input.hallname).empty() && input.hallname[0]==' ') {
-		input.hallname.erase(0, 1);
-	}
+	std::stringstream ss(line);
+	extractOrthrow(ss, input.from, "Invalide from-date!");
+	extractOrthrow(ss, input.to, "Invalide to-date!");
+	std::getline(ss >> std::ws, input.hallname);
 	return input;
 }
 ReportInfo InputParser::getAttendenceData(bool access) {
-	if (!access) {
-		std::cin.ignore(1024, '\n');
-		throw std::logic_error("Another file has already been opened. Close it before opening a new one!");
-	}
+	validateAcess(access);
 	ReportInfo input;
-	if (!(std::cin >> input.from >> input.to)) {
-		throw std::invalid_argument("Invalid input format! Correct: report <from> <to> [<hall>]");
+	std::string line;
+	if (!(std::getline(std::cin, line))) {
+		throw std::invalid_argument("Invalid input format! Correct: report <from> <to>");
 	}
+	std::stringstream ss(line);
+	extractOrthrow(ss, input.from, "Invalide from-date!");
+	extractOrthrow(ss, input.to, "Invalide to-date!");
 	return input;
 }

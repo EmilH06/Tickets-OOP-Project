@@ -44,7 +44,7 @@ Valid:
 
 Buy: 
 Fails:
-> buy 11 11 2030-10-01 Inception
+> buy 9 10 2030-10-01 Inception
 Valid:
 > buy 5 5 2027-05-19 The grinch
 
@@ -67,4 +67,4 @@ Report:
 Attend:
 > attendence 2027-05-19 2029-01-01
 > attendence 2024-11-23 2030-12-05
-  > 2026-02-10 Pandora box
+  > 2027-12-30 The hobbits

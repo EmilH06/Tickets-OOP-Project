@@ -7,7 +7,7 @@ struct AddeventInfo {
 	std::string hall_name;
 	std::string hall_word;
 	std::string hallNum;
-	AddeventInfo() = default;
+	void validate();
 };
 struct BookingInfo {
 	int row = 0;
@@ -16,12 +16,15 @@ struct BookingInfo {
 	std::string name;
 	std::string note;
 	std::string line;
-	BookingInfo() = default;
+	void validate();
 };
 struct ReportInfo {
 	std::string from;
 	std::string to;
 	std::string hallname;
+	std::string hall_word;
+	std::string hallNum;
 	std::string command;
-	ReportInfo() = default;
+	void validate();
 };
+void isValidDate(const std::string);

@@ -36,6 +36,9 @@
     <ClCompile Include="InputParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InputParameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Event.h">

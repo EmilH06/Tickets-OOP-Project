@@ -11,4 +11,11 @@ Name:The grinch
 Date:2027-05-19
 Hall:Hall 4
 Tickets:
+20270519Thegrinch55 5 5 PURCHASED ""
+<EVENT END>
+<EVENT START>
+Name:Lord of the rings
+Date:2026-01-10
+Hall:Hall 2
+Tickets:
 <EVENT END>

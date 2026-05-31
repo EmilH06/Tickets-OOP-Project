@@ -130,6 +130,7 @@
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="EventsManager.cpp" />
     <ClCompile Include="Halls.cpp" />
+    <ClCompile Include="InputParameters.cpp" />
     <ClCompile Include="InputParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="BasicCommands.h" />

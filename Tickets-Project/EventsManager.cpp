@@ -219,13 +219,9 @@ void Manager::file_exit() {
 	std::cin.ignore(1024, '\n');
 }
 void Manager::addevent(AddeventInfo input) {
-	if (!access) {
-		throw std::logic_error("You haven't open any file!");
-	}
+	    input.validate();
 		isValidHall(input.hall_name);
-		isValidDate(input.date);
 		isAvaiableDate(input.date, input.hall_name);
-		isValidEventName(input.name);
 		auto hallByIdx = [&](std::string name) -> Hall& {
 			for (size_t i = 0; i < avaiable_halls.size(); i++) {
 				if (avaiable_halls[i].getName() == name) {
@@ -236,27 +232,27 @@ void Manager::addevent(AddeventInfo input) {
 			std::cin.ignore(1024, '\n');
 			};
 		this->info.push_back(Event(input.name, input.date, hallByIdx(input.hall_name)));
-		std::cout << "Successfully added event: " << input.name << std::endl;
+		std::cout << "Successfully added event: " << input.name << '\n';
 }
 void Manager::freeseats(BookingInfo input) {
-	isValidEventName(input.name);
+	input.validate();
 	functionApply(input.name, input.date, [&](Event& e)->void {e.getFreeseats(); });
 }
 void Manager::book(BookingInfo input) {
-	isValidEventName(input.name);
+	input.validate();
 	bool foundMatch = false;
 	functionApply(input.name, input.date,[&](Event& e)->void{ e.addTicket("none", input.row, input.seat, "RESERVED", input.note); });
-	std::cout << "Successfully booked your seat!" << std::endl;
+	std::cout << "Successfully booked your seat!" << '\n';
 }
 void Manager::unbook(BookingInfo input) {
-	isValidEventName(input.name);
+	input.validate();
 	functionApply(input.name, input.date, [&](Event& e)->void {e.removeTicket(input.row, input.seat); });
-	std::cout << "Successfully unbooked your seat!" << std::endl;
+	std::cout << "Successfully unbooked your seat!" << '\n';
 }
 void Manager::buy(BookingInfo input) {
-	isValidEventName(input.name);
+	input.validate();
 	functionApply(input.name, input.date, [&](Event& e)->void { e.purchaseTicket(input.name, input.date, input.row, input.seat, input.note); });
-	std::cout << "Successfully purchased your seat!" << std::endl;
+	std::cout << "Successfully purchased your seat!" << '\n';
 }
 void Manager::bookings(BookingInfo input) {
 		bool foundMatch = false;
@@ -279,7 +275,7 @@ void Manager::bookings(BookingInfo input) {
 			for (int i = 0; i < info.size(); i++) {
 				if (input.name == info[i].getName()) {
 					foundMatch = true;
-					std::cout << "Perormance: " << info[i].getName() << " (" << input.date << ")\n";
+					std::cout << "<NEW PERFORMANCE> " << info[i].getName() << " (" << input.date << ")\n";
 					info[i].getBookedSeats();
 				}
 			}
@@ -288,12 +284,12 @@ void Manager::bookings(BookingInfo input) {
 			std::cout << "Events\n";
 			for (int i = 0; i < info.size(); i++) {
 				foundMatch = true;
-				std::cout << "Perormance: " << info[i].getName() << " (" << info[i].getDate() << ")\n";
+				std::cout << "<NEW PERFORMANCE> " << info[i].getName() << " (" << info[i].getDate() << ")" << '\n';
 				info[i].getBookedSeats();
 			}
 		}
 		if (!foundMatch) {
-			throw std::invalid_argument("There isn't an event registered to this name or date!");
+			std::cout<<" None\n";
 		}
 }
 void Manager::check(std::string code) {
@@ -305,8 +301,7 @@ void Manager::check(std::string code) {
 	throw std::logic_error("Invalid ticket code");
 }
 void Manager::report(ReportInfo input) {
-	isValidDate(input.from);
-	isValidDate(input.to);
+	input.validate();
 	if (!input.hallname.empty()) {
 		isValidHall(input.hallname);
 		std::cout << "LIST OF EVENTS FROM " << input.hallname << std::endl;;
@@ -343,8 +338,7 @@ void Manager::mostviewed() {
 	std::cout << std::endl;
 }
 void Manager::attendence(ReportInfo input) {
-	isValidDate(input.from);
-	isValidDate(input.to);
+	input.validate();
 	std::vector<int> IdxList;
 	for (size_t i = 0; i < info.size(); i++) {
 		if (info[i].getAttendence(input.from, input.to)) {
@@ -353,7 +347,6 @@ void Manager::attendence(ReportInfo input) {
 	}
 	std::cout << "You can take down any of the underperformers by typing: <date> <name>. If not type \"No\" or leave it empty!\n";
 	std::cout << "Your choice: ";
-	std::cin.ignore(1024, '\n');
 	std::getline(std::cin, input.command);
 	if (input.command == "No" || input.command.empty()) {
 		return;
@@ -367,65 +360,10 @@ void Manager::attendence(ReportInfo input) {
 	int validator = existInList(name, date);
 	if (validator!=-1) {
 		info.erase(info.begin() + validator);
-		std::cout << "Successfully removed the event!" << std::endl;
-		std::cin.ignore(1024, '\n');
+		std::cout << "Successfully removed the event!" << '\n';
 		return;
 	}
 	throw std::invalid_argument("The name and date provided dont't exist withing the underperformers list!");
-}
-void Manager::isValidEventName(const std::string name) const {
-	if (name.empty()) {
-		throw std::invalid_argument("Error: Name cannot be empty!");
-	}
-}
-void Manager::isValidHall(const std::string hall) const {
-	auto name_validator = [&]()->bool {for (Hall x : avaiable_halls) { if (x.getName() == hall) return true; }return false; };
-	if (!name_validator()) {
-		throw std::invalid_argument("There isn't avaiable hall with that name!");
-	}
-}
-void Manager::isValidDate(const std::string date) const {
-	if (date.size() != 10) {
-		throw std::invalid_argument("Invalid date format. Input should have 10 symbols!");
-	}
-	if (date[4] != '-' || date[7] != '-') {
-		throw std::invalid_argument("Invalid date format. Format should be: 'xxxx-xx-xx'!");
-	}
-	for (size_t i = 0; i < date.size(); i++) {
-		if (i != 4 && i != 7) {
-			if (date[i] < '0' || date[i]>'9') {
-				throw std::invalid_argument("Invalid date format. The input should consist only of numbers and '-' as shown: 'YYYY-MM-DD'");
-			}
-		}
-	}
-	int year = std::stoi(date.substr(0, 4));
-	int mouth = std::stoi(date.substr(5, 2));
-	int day = std::stoi(date.substr(8, 2));
-	auto validDay = [&]()->bool {
-		switch (mouth) {
-		case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 8:
-		case 10:
-		case 12: return (day >= 1 && day <= 31);
-		case 2: if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
-			return (day >= 1 && day <= 29);
-		} else { 
-			return (day >= 1 && day <= 28); 
-		}
-		case 4:
-		case 6:
-		case 9:
-		case 11: return (day >= 1 && day <= 30);
-		default: throw std::invalid_argument("Invalid date format. The mouth should be betweemn 1 and 12");
-		}
-		return false;
-		};
-	if (!validDay()) {
-		throw std::invalid_argument("Invalid date format. This mouth doesn't have that many days!");
-	}
 }
 void Manager::isAvaiableDate(const std::string date, const std::string hall_name) const {
 	auto matchingDates = [&]()->bool {
@@ -439,5 +377,11 @@ void Manager::isAvaiableDate(const std::string date, const std::string hall_name
 		};
 	if (matchingDates()) {
 		throw std::invalid_argument("Invalid date format. This date has already been reserved!");
+	}
+}
+void Manager::isValidHall(const std::string hall) const {
+	auto name_validator = [&]()->bool {for (Hall x : avaiable_halls) { if (x.getName() == hall) return true; }return false; };
+	if (!name_validator()) {
+		throw std::invalid_argument("There isn't avaiable hall with that name!");
 	}
 }

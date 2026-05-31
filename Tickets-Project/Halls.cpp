@@ -20,17 +20,14 @@ Hall::Hall(const Hall& other) {
 		return cols;
 	}
 	void Hall::printByStatus(const TicketStatus& temp_status) const{
-		bool foundAvaiable = false;
 		for (size_t i = 0; i < seats.size(); i++) {
 			bool foundBySeat = false;
 			std::cout << "Row " << i + 1 << std::endl;
 			std::cout << "Seats: ";
 			for (size_t j = 0; j < seats[i].size(); j++) {
 				if (seats[i][j] == temp_status) {
-					foundAvaiable = true;
 					foundBySeat = true;
-					std::cout << j + 1;
-					if (j < seats[i].size() - 1) { std::cout << ", "; }
+					std::cout << j + 1<<' ';
 				}
 			}
 			if (!foundBySeat) {
@@ -39,9 +36,6 @@ Hall::Hall(const Hall& other) {
 			std::cout << std::endl;
 		}
 		std::cout << std::endl;
-		if (!foundAvaiable) {
-			std::cout << "No seats are avaiable!" << std::endl;;
-		}
 	}
 	void Hall::saveTicket(const int& row, const int& col,const std::string& status) {
 		int rowIdx = row - 1;
