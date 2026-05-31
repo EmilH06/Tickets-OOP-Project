@@ -12,4 +12,3 @@ Date:2027-05-19
 Hall:Hall 4
 Tickets:
 <EVENT END>
-
