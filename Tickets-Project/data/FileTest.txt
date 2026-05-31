@@ -1,7 +1,0 @@
-<EVENT START>
-Name:The hobbits
-Date:2027-12-30
-Hall:Hall 4
-Tickets:
-uniqueCode row seat status note
-<EVENT END>

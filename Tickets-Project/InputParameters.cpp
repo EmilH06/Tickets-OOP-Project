@@ -12,8 +12,8 @@ void BookingInfo :: validate() {
 	if (name.empty()) {
 		throw std::invalid_argument("Error: Name cannot be empty!");
 	}
-	if (row < 0 || seat < 0) {
-		throw std::logic_error("The row and the seat can't be negative numbers");
+	if (row <= 0 || seat <= 0) {
+		throw std::logic_error("The row and the seat can't be negative numbers or 0");
 	}
 	isValidDate(date);
 
